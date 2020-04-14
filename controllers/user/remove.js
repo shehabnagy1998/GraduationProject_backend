@@ -6,6 +6,7 @@ module.exports = async (req, res, database) => {
   let role_id = req.query.role_id;
   let role_type = "";
   let errFlag = false;
+  let userInfo = {};
 
   let isUserExist = async (_) => {
     try {
@@ -13,7 +14,10 @@ module.exports = async (req, res, database) => {
         code,
       ]);
       if (res.length >= 1) {
-        return true;
+        {
+          userInfo = res[0];
+          return true;
+        }
       } else return false;
     } catch (error) {
       console.log(error);
@@ -26,6 +30,18 @@ module.exports = async (req, res, database) => {
       const res = await database(`DELETE FROM ${role_type} WHERE code=?`, [
         code,
       ]);
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+
+  let unAssignStudent = async (_) => {
+    try {
+      const coursesRes = await database(
+        `DELETE FROM student_course WHERE student_code=?`,
+        [code]
+      );
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -61,6 +77,9 @@ module.exports = async (req, res, database) => {
   }
 
   await deleteUser();
+
+  if (userInfo.is_approved) await unAssignStudent();
+
   const newData = await getAllUsers();
   if (errFlag) {
     res.status(500).send({ msg: `internal server error` });

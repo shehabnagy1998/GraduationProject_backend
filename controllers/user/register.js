@@ -93,7 +93,7 @@ module.exports = async (req, res, database) => {
     }
   };
 
-  let insertData = async (_) => {
+  let insertStudentData = async (_) => {
     try {
       const res = await database(
         `INSERT INTO ${role_type} (code, phone, email, name, password, token, grade_year_id, department_id) VALUE (?,?,?,?,?,?,?,?)`,
@@ -108,6 +108,27 @@ module.exports = async (req, res, database) => {
           department_id,
         ]
       );
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+  let insertOtherData = async (_) => {
+    try {
+      const res = await database(
+        `INSERT INTO ${role_type} (code, phone, email, name, password, token) VALUE (?,?,?,?,?,?)`,
+        [code, phone, email, name, password, token]
+      );
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+
+  let getAllUsers = async (_) => {
+    try {
+      const res = await database(`SELECT * FROM ${role_type}`);
+      return res;
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -172,20 +193,6 @@ module.exports = async (req, res, database) => {
     return;
   }
 
-  if (!(await isDepartmentExist())) {
-    res.status(400).send({
-      msg: `department not exist`,
-    });
-    return;
-  }
-
-  if (!(await isGradeYearExist())) {
-    res.status(400).send({
-      msg: `grade year not exist`,
-    });
-    return;
-  }
-
   token = await jwt.sign({ email, role_id }, process.env.PRIVATE_KEY, {
     expiresIn: "2190h",
   });
@@ -197,13 +204,35 @@ module.exports = async (req, res, database) => {
     return;
   }
 
-  await insertData();
+  let newData;
+  if (role_type == "student") {
+    if (!(await isDepartmentExist())) {
+      res.status(400).send({
+        msg: `department not exist`,
+      });
+      return;
+    }
+
+    if (!(await isGradeYearExist())) {
+      res.status(400).send({
+        msg: `grade year not exist`,
+      });
+      return;
+    }
+    await insertStudentData();
+  } else {
+    await insertOtherData();
+    newData = await getAllUsers();
+  }
 
   if (errFlag) {
     res.status(500).send({ msg: `internal server error` });
     return;
   }
-  res
-    .status(200)
-    .send({ msg: "account created successfully but its not approved yet" });
+
+  if (role_type === "student")
+    res
+      .status(200)
+      .send({ msg: "account created successfully but its not approved yet" });
+  else res.status(200).send(newData);
 };

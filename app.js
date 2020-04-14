@@ -7,10 +7,10 @@ const corsOptions = {
   origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
-module.exports = database => {
+module.exports = (database) => {
   const app = express();
   const port = process.env.PORT || process.env.PORT_DEV;
   // middlwares
@@ -25,7 +25,7 @@ module.exports = database => {
   // route management
   routes(app, database);
   // app starting
-  app.listen(port, err => {
+  app.listen(port, (err) => {
     if (err) console.log(err);
     else
       console.log(

@@ -8,7 +8,7 @@ const changeInformation = require("./changeInformation");
 const changePassword = require("./changePassword");
 const getAll = require("./getAll");
 const remove = require("./remove");
-const approve = require("./approve");
+const toggleApprove = require("./toggleApprove");
 
 module.exports = (app, database) => {
   app.post(`${base_url}/register`, CDN.uploadUserPic.none(), (req, res) => {
@@ -19,8 +19,8 @@ module.exports = (app, database) => {
     login(req, res, database);
   });
 
-  app.put(`${base_url}/approve`, (req, res) => {
-    approve(req, res, database);
+  app.put(`${base_url}/toggleApprove`, CDN.uploadUserPic.none(), (req, res) => {
+    toggleApprove(req, res, database);
   });
 
   app.put(
