@@ -36,6 +36,13 @@ const uploadAssignmentAnswerPic = multer({
   }),
 });
 
+const uploadPostPic = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, next) => next(null, createFolder([dir, "post"])),
+    filename: (req, file, next) => next(null, file.originalname),
+  }),
+});
+
 const remove = async (path) => {
   try {
     if (path && path !== "") fs.unlinkSync(path);
@@ -48,5 +55,6 @@ module.exports = {
   uploadUserPic,
   uploadAssignmentPic,
   uploadAssignmentAnswerPic,
+  uploadPostPic,
   remove,
 };
