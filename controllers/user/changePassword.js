@@ -48,7 +48,7 @@ module.exports = async (req, res, database) => {
 
   if (!(await isPasswordCorrect())) {
     res.status(400).send({
-      message: "incorrect old password",
+      message: "old password is invalid",
     });
     return;
   }

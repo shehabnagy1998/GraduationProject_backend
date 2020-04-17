@@ -71,7 +71,7 @@ module.exports = async (req, res, database) => {
   role_type = helpers.setType(role_id);
   if (!(await isUserExist())) {
     res.status(400).send({
-      message: `user not found`,
+      message: `user not exist`,
     });
     return;
   }

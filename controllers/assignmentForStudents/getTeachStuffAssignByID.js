@@ -48,7 +48,7 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isAssignmentExist())) {
-    res.status(400).send({ msg: `assignment doesn't exist` });
+    res.status(400).send({ msg: `assignment not exist` });
     return;
   }
 

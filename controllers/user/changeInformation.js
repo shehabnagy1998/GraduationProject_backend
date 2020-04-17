@@ -88,14 +88,14 @@ module.exports = async (req, res, database) => {
 
   if (await isEmailExist()) {
     res.status(400).send({
-      message: `the new email is already exist`,
+      message: `email already exist`,
     });
     return;
   }
 
   if (await isPhoneExist()) {
     res.status(400).send({
-      message: `the new phone is already exist`,
+      message: `phone already exist`,
     });
     return;
   }

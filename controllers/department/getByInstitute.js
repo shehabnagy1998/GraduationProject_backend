@@ -2,52 +2,51 @@ module.exports = async (req, res, database) => {
   let institute_id = req.query.institute_id;
   let errFlag = false;
 
-  let isInstituteExist = async _ => {
+  let isInstituteExist = async (_) => {
     try {
-      const res = await database('SELECT * FROM institute WHERE id=? LIMIt 1', [institute_id]);
-      if (res.length >= 1) return true
-      else return false
+      const res = await database("SELECT * FROM institute WHERE id=? LIMIt 1", [
+        institute_id,
+      ]);
+      if (res.length >= 1) return true;
+      else return false;
     } catch (error) {
       console.log(error);
-      errFlag = true
+      errFlag = true;
     }
   };
 
-  let getByInstitute = async _ => {
+  let getByInstitute = async (_) => {
     try {
-      const res = await database('SELECT * FROM department WHERE institute_id=?', [institute_id]);
+      const res = await database(
+        "SELECT * FROM department WHERE institute_id=?",
+        [institute_id]
+      );
       return res;
     } catch (error) {
       console.log(error);
-      errFlag = true
+      errFlag = true;
     }
   };
 
   //////////////////////////////////////////////////////////
 
-  if (
-    !institute_id
-  ) {
+  if (!institute_id) {
     res.status(400).send({
-      message: `${
-        !institute_id
-          ? "institute_id"
-          : ""
-        } is missing`
+      message: `${!institute_id ? "institute_id" : ""} is missing`,
     });
     return;
   }
 
   if (!(await isInstituteExist())) {
-    res.status(402).send({ msg: `institute does't exist` });
-    return
+    res.status(402).send({ msg: `institute not exist` });
+    return;
   }
 
   let data = await getByInstitute();
 
   if (errFlag) {
     res.status(500).send({ msg: `internal server error` });
-    return
+    return;
   }
   res.status(200).send(data);
 };

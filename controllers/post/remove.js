@@ -75,7 +75,7 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isExist())) {
-    res.status(402).send({ msg: `post doesn't exist` });
+    res.status(402).send({ msg: `post not exist` });
     return;
   }
 

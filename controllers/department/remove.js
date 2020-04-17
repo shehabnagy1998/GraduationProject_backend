@@ -2,55 +2,52 @@ module.exports = async (req, res, database) => {
   let id = req.query.id;
   let errFlag = false;
 
-  let isExist = async _ => {
+  let isExist = async (_) => {
     try {
-      const res = await database('SELECT * FROM department WHERE id=? LIMIt 1', [id]);
-      console.log(res)
-      if (res.length >= 1) return true
-      else return false
+      const res = await database(
+        "SELECT * FROM department WHERE id=? LIMIt 1",
+        [id]
+      );
+      console.log(res);
+      if (res.length >= 1) return true;
+      else return false;
     } catch (error) {
       console.log(error);
       errFlag = true;
     }
   };
 
-  let remove = async _ => {
+  let remove = async (_) => {
     try {
-      const res = await database('DELETE FROM department WHERE id=?', [id]);
+      const res = await database("DELETE FROM department WHERE id=?", [id]);
     } catch (error) {
       console.log(error);
-      errFlag = true
+      errFlag = true;
     }
   };
 
-  let getAll = async _ => {
+  let getAll = async (_) => {
     try {
-      const res = await database('SELECT * FROM department');
+      const res = await database("SELECT * FROM department");
       return res;
     } catch (error) {
       console.log(error);
-      errFlag = true
+      errFlag = true;
     }
   };
 
   ////////////////////////////////////////////////////////////////////////
 
-  if (
-    !id
-  ) {
+  if (!id) {
     res.status(400).send({
-      message: `${
-        !id
-          ? "id"
-          : ""
-        } is missing`
+      message: `${!id ? "id" : ""} is missing`,
     });
     return;
   }
 
-  if (!await isExist()) {
-    res.status(402).send({ msg: `department doesn't exist` });
-    return
+  if (!(await isExist())) {
+    res.status(402).send({ msg: `department not exist` });
+    return;
   }
 
   await remove();
@@ -58,7 +55,7 @@ module.exports = async (req, res, database) => {
 
   if (errFlag) {
     res.status(500).send({ msg: `internal server error` });
-    return
+    return;
   }
   res.status(200).send(newData);
 };

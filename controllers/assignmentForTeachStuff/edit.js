@@ -164,7 +164,7 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isExist())) {
-    res.status(400).send({ msg: `assignment doesn't exist` });
+    res.status(400).send({ msg: `assignment not exist` });
     return;
   }
 
@@ -176,7 +176,7 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isCourseExist())) {
-    res.status(400).send({ msg: `course doesn't exist` });
+    res.status(400).send({ msg: `course not exist` });
     return;
   }
 

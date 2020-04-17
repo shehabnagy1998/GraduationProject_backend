@@ -28,7 +28,7 @@ module.exports = async (req, res, database) => {
       if (res.length >= 1) return true;
       else {
         errFlag = true;
-        errText = `assistant with code ${assisCode} doesn't exist`;
+        errText = `assistant with code ${assisCode} not exist`;
         errCode = 400;
         return false;
       }
@@ -62,7 +62,7 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isCourseExist())) {
-    res.status(400).send({ msg: `course doesn't exist` });
+    res.status(400).send({ msg: `course not exist` });
     return;
   }
 

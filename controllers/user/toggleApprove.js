@@ -97,7 +97,7 @@ module.exports = async (req, res, database) => {
 
   if (!(await isExist())) {
     res.status(400).send({
-      message: `student doesn't exist`,
+      message: `student not exist`,
     });
     return;
   }

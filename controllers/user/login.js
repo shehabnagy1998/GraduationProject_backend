@@ -100,6 +100,8 @@ module.exports = async (req, res, database) => {
     }
   };
 
+  ///////////////////////////////////////////////////////////////////////////////
+
   // check for valid incoming varaibles
   if (!email || !password || !role_id) {
     res.status(400).send({
@@ -119,16 +121,17 @@ module.exports = async (req, res, database) => {
   }
   if (!(await isPasswordCorrect())) {
     res.status(400).send({
-      message: `password is incorrect`,
+      message: `password is invalid`,
     });
     return;
   }
-  // if (!userInfo.is_approved) {
-  //   res.status(400).send({
-  //     message: `account not approved yet`,
-  //   });
-  //   return;
-  // }
+
+  if (!userInfo.is_approved) {
+    res.status(400).send({
+      message: `account hasn't approved yet`,
+    });
+    return;
+  }
 
   await insertData();
   await getDepartment();

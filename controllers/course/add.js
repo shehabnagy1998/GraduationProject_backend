@@ -136,17 +136,17 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isDoctorExist())) {
-    res.status(402).send({ msg: `doctor does't exist` });
+    res.status(402).send({ msg: `doctor not exist` });
     return;
   }
 
   if (!(await isDepartmentExist())) {
-    res.status(402).send({ msg: `department does't exist` });
+    res.status(402).send({ msg: `department not exist` });
     return;
   }
 
   if (!(await isGradeYearExist())) {
-    res.status(402).send({ msg: `grade year does't exist` });
+    res.status(402).send({ msg: `grade year not exist` });
     return;
   }
 

@@ -77,13 +77,13 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isAssignmentExist())) {
-    res.status(400).send({ msg: `assignment doesn't exist` });
+    res.status(400).send({ msg: `assignment not exist` });
     return;
   }
 
   if (!(await isStudentExist())) {
     res.status(400).send({
-      msg: `student doesn't exist`,
+      msg: `student not exist`,
     });
     return;
   }
