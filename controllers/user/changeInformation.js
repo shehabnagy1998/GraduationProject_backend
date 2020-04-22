@@ -103,7 +103,7 @@ module.exports = async (req, res, database) => {
   let data = await insertData();
 
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
 

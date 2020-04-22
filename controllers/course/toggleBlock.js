@@ -73,27 +73,29 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isCourseExist())) {
-    res.status(400).send({ msg: `course not exist` });
+    res.status(400).send({ message: `course not exist` });
     return;
   }
 
   if (!(await isStudentExist())) {
-    res.status(400).send({ msg: `student not exist` });
+    res.status(400).send({ message: `student not exist` });
     return;
   }
 
   if (!(await isStudentAssigned())) {
-    res.status(400).send({ msg: `student is not in this course` });
+    res.status(400).send({ message: `student is not in this course` });
     return;
   }
 
   await toggleBlock();
 
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
   res
     .status(200)
-    .send({ msg: `student has been ${!is_blocked ? "blocked" : "unblocked"}` });
+    .send({
+      message: `student has been ${!is_blocked ? "blocked" : "unblocked"}`,
+    });
 };

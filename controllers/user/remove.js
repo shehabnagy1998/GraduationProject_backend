@@ -82,7 +82,7 @@ module.exports = async (req, res, database) => {
 
   const newData = await getAllUsers();
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
   res.status(200).send(newData);

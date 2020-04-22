@@ -132,12 +132,12 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isAssignmentExist())) {
-    res.status(402).send({ msg: `assignment not exist` });
+    res.status(402).send({ message: `assignment not exist` });
     return;
   }
 
   if (await isExist()) {
-    res.status(402).send({ msg: `you have solved this assignment before` });
+    res.status(402).send({ message: `you have solved this assignment before` });
     return;
   }
 
@@ -146,7 +146,7 @@ module.exports = async (req, res, database) => {
   let dataDeliverd = await getAllDeliverd();
 
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
   res.status(200).send({ available: dataAvailable, delivered: dataDeliverd });

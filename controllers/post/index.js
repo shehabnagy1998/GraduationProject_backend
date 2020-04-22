@@ -6,6 +6,8 @@ const getAll = require("./getAll");
 const add = require("./add");
 const remove = require("./remove");
 const edit = require("./edit");
+const toggleSavePost = require("./toggleSavePost");
+const getAllSaved = require("./getAllSaved");
 
 module.exports = (app, database) => {
   app.post(
@@ -26,11 +28,28 @@ module.exports = (app, database) => {
     }
   );
 
+  app.put(
+    `${base_url}/toggleSavePost`,
+    (req, res, next) => auth(req, res, next, database),
+    CDN.uploadPostPic.none(),
+    (req, res) => {
+      toggleSavePost(req, res, database);
+    }
+  );
+
   app.get(
     `${base_url}/getAll`,
     (req, res, next) => auth(req, res, next, database),
     (req, res) => {
       getAll(req, res, database);
+    }
+  );
+
+  app.get(
+    `${base_url}/getAllSaved`,
+    (req, res, next) => auth(req, res, next, database),
+    (req, res) => {
+      getAllSaved(req, res, database);
     }
   );
 

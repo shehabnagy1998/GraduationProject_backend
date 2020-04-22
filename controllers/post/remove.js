@@ -75,13 +75,13 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isExist())) {
-    res.status(402).send({ msg: `post not exist` });
+    res.status(402).send({ message: `post not exist` });
     return;
   }
 
   if (!(await isOwner())) {
     res.status(400).send({
-      msg: `you are not the owner of the post`,
+      message: `you are not the owner of the post`,
     });
     return;
   }
@@ -89,8 +89,8 @@ module.exports = async (req, res, database) => {
   await deleteOld();
 
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
-  res.status(200).send({ msg: "post deleted successfully" });
+  res.status(200).send({ message: "post deleted successfully" });
 };

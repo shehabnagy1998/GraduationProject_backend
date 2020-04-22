@@ -62,13 +62,13 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isCourseExist())) {
-    res.status(400).send({ msg: `course not exist` });
+    res.status(400).send({ message: `course not exist` });
     return;
   }
 
   codesArr = assistant_codes.split(",");
   if (codesArr.length <= 0) {
-    res.status(400).send({ msg: `assistants codes is empty` });
+    res.status(400).send({ message: `assistants codes is empty` });
     return;
   }
 
@@ -79,9 +79,9 @@ module.exports = async (req, res, database) => {
     }
   }
   if (errFlag) {
-    res.status(errCode).send({ msg: errText });
+    res.status(errCode).send({ message: errText });
     console.log("exited");
     return;
   }
-  res.status(200).send({ msg: `assistants removed from the course` });
+  res.status(200).send({ message: `assistants removed from the course` });
 };

@@ -61,13 +61,13 @@ module.exports = async (req, res, database) => {
     return;
   }
 
-  if (!(await !isExist())) {
-    res.status(402).send({ msg: `institute not exist` });
+  if (!(await isExist())) {
+    res.status(402).send({ message: `institute not exist` });
     return;
   }
 
-  if (await !isDuplicate()) {
-    res.status(402).send({ msg: `institute already exist` });
+  if (await isDuplicate()) {
+    res.status(402).send({ message: `institute already exist` });
     return;
   }
 
@@ -75,7 +75,7 @@ module.exports = async (req, res, database) => {
   const newData = await getAll();
 
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
   res.status(200).send(newData);

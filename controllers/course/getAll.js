@@ -15,7 +15,7 @@ module.exports = async (req, res, database) => {
 
   let data = await getAll();
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
   res.status(200).send(data);

@@ -38,14 +38,14 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isInstituteExist())) {
-    res.status(402).send({ msg: `institute not exist` });
+    res.status(402).send({ message: `institute not exist` });
     return;
   }
 
   let data = await getByInstitute();
 
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
   res.status(200).send(data);

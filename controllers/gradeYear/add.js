@@ -1,64 +1,62 @@
 module.exports = async (req, res, database) => {
   let name = req.body.name;
-  let errFlag = false
+  let errFlag = false;
 
-  let isExist = async _ => {
+  let isExist = async (_) => {
     try {
-      const res = await database('SELECT * FROM grade_year WHERE name=? LIMIt 1', [name]);
-      if (res.length >= 1) return true
-      else return false
+      const res = await database(
+        "SELECT * FROM grade_year WHERE name=? LIMIt 1",
+        [name]
+      );
+      if (res.length >= 1) return true;
+      else return false;
     } catch (error) {
       console.log(error);
-      errFlag = true
+      errFlag = true;
     }
   };
 
-
-  let insertNew = async _ => {
+  let insertNew = async (_) => {
     try {
-      const res = await database('INSERT INTO grade_year (name) VALUE (?)', [name]);
+      const res = await database("INSERT INTO grade_year (name) VALUE (?)", [
+        name,
+      ]);
     } catch (error) {
       console.log(error);
-      errFlag = true
+      errFlag = true;
     }
   };
 
-  let getAll = async _ => {
+  let getAll = async (_) => {
     try {
-      const res = await database('SELECT * FROM grade_year');
+      const res = await database("SELECT * FROM grade_year");
       return res;
     } catch (error) {
       console.log(error);
-      errFlag = true
+      errFlag = true;
     }
   };
 
   /////////////////////////////////////////////////////////////////////////////////
 
-  if (
-    !name
-  ) {
+  if (!name) {
     res.status(400).send({
-      message: `${
-        !name
-          ? "name"
-          : ""
-        } is missing`
+      message: `${!name ? "name" : ""} is missing`,
     });
     return;
   }
 
   if (await isExist()) {
-    res.status(402).send({ msg: `grade year already exist` });
-    return
+    res.status(402).send({ message: `grade year already exist` });
+    return;
   }
 
   await insertNew();
-  const newData = await getAll()
+  const newData = await getAll();
 
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
-    return
+    res.status(500).send({ message: `internal server error` });
+    return;
   }
   res.status(200).send(newData);
 };

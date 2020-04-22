@@ -174,21 +174,21 @@ module.exports = async (req, res, database) => {
   role_type = helpers.setType(role_id);
   if (await isEmailExist()) {
     res.status(400).send({
-      msg: `email already exist`,
+      message: `email already exist`,
     });
     return;
   }
 
   if (await isCodeExist()) {
     res.status(400).send({
-      msg: `code already exist`,
+      message: `code already exist`,
     });
     return;
   }
 
   if (await isPhoneExist()) {
     res.status(400).send({
-      msg: `phone already exist`,
+      message: `phone already exist`,
     });
     return;
   }
@@ -208,14 +208,14 @@ module.exports = async (req, res, database) => {
   if (role_type == "student") {
     if (!(await isDepartmentExist())) {
       res.status(400).send({
-        msg: `department not exist`,
+        message: `department not exist`,
       });
       return;
     }
 
     if (!(await isGradeYearExist())) {
       res.status(400).send({
-        msg: `grade year not exist`,
+        message: `grade year not exist`,
       });
       return;
     }
@@ -226,13 +226,15 @@ module.exports = async (req, res, database) => {
   }
 
   if (errFlag) {
-    res.status(500).send({ msg: `internal server error` });
+    res.status(500).send({ message: `internal server error` });
     return;
   }
 
   if (role_type === "student")
     res
       .status(200)
-      .send({ msg: "account created successfully but its not approved yet" });
+      .send({
+        message: "account created successfully but its not approved yet",
+      });
   else res.status(200).send(newData);
 };

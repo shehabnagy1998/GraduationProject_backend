@@ -1,53 +1,22 @@
 module.exports = async (req, res, database) => {
-  let type = req.query.type;
-  let course_code = req.query.course_code;
   let errFlag = false;
   let role_type = res.locals.role_type;
   let user = res.locals.user;
 
-  let isCourseExist = async (_) => {
-    try {
-      const res = await database(
-        "SELECT code FROM course WHERE code=? LIMIt 1",
-        [course_code]
-      );
-      if (res.length >= 1) return true;
-      else return false;
-    } catch (error) {
-      console.log(error);
-      errFlag = true;
-    }
-  };
-
   let getAll = async (_) => {
     try {
       const selectRes = await database(
-        `SELECT post.*, course.name AS course_name FROM post, course WHERE course.code=post.course_code AND course_code=? AND type=?`,
-        [course_code, type]
+        `SELECT post.*, course.name AS course_name FROM post, course, saved_post WHERE course.code=post.course_code AND post.id=saved_post.post_id AND saved_post.${role_type}_code=?`,
+        [user.code]
       );
       if (selectRes && selectRes.length >= 1) {
         for (let i = 0; i < selectRes.length; i++) {
           const element = selectRes[i];
-          selectRes[i].is_saved = await isSaved(element.id);
           selectRes[i].files = await getAllHelper(element.id);
           selectRes[i].owner = await getAllHelper2(element);
         }
       }
       return selectRes;
-    } catch (error) {
-      console.log(error);
-      errFlag = true;
-    }
-  };
-
-  let isSaved = async (post_id) => {
-    try {
-      const res = await database(
-        `SELECT id FROM saved_post WHERE post_id=? AND ${role_type}_code=? LIMIt 1`,
-        [post_id, user.code]
-      );
-      if (res.length >= 1) return true;
-      else return false;
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -91,20 +60,6 @@ module.exports = async (req, res, database) => {
   };
 
   //////////////////////////////////////////////
-
-  if (!type || !course_code) {
-    res.status(400).send({
-      message: `${
-        !type ? "type" : !course_code ? "course_code" : ""
-      } is missing`,
-    });
-    return;
-  }
-
-  if (!(await isCourseExist())) {
-    res.status(402).send({ message: `course not exist` });
-    return;
-  }
 
   let data = await getAll();
 
