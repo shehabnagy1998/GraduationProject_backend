@@ -126,7 +126,7 @@ module.exports = async (req, res, database) => {
     return;
   }
 
-  if (!userInfo.is_approved) {
+  if (role_id == 0 && !userInfo.is_approved) {
     res.status(400).send({
       message: `account hasn't approved yet`,
     });
