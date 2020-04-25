@@ -51,7 +51,7 @@ module.exports = async (req, res, database) => {
   let getAllUsers = async (_) => {
     try {
       const res = await database(
-        `SELECT ${role_type}.*, department.name AS department_name, grade_year.name AS grade_year_name FROM ${role_type},department, grade_year WHERE department.id=${role_type}.depratment_id AND grade_year.id=${role_type}.grade_year_id`
+        `SELECT ${role_type}.*, department.name AS department_name, grade_year.name AS grade_year_name FROM ${role_type},department, grade_year WHERE department.id=${role_type}.department_id AND grade_year.id=${role_type}.grade_year_id`
       );
       return res;
     } catch (error) {
