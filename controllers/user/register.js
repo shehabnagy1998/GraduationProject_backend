@@ -127,7 +127,9 @@ module.exports = async (req, res, database) => {
 
   let getAllUsers = async (_) => {
     try {
-      const res = await database(`SELECT * FROM ${role_type}`);
+      const res = await database(
+        `SELECT ${role_type}.*, department.name AS department_name, grade_year.name AS grade_year_name FROM ${role_type},department, grade_year WHERE department.id=${role_type}.depratment_id AND grade_year.id=${role_type}.grade_year_id`
+      );
       return res;
     } catch (error) {
       console.log(error);
@@ -231,10 +233,8 @@ module.exports = async (req, res, database) => {
   }
 
   if (role_type === "student")
-    res
-      .status(200)
-      .send({
-        message: "account created successfully but its not approved yet",
-      });
+    res.status(200).send({
+      message: "account created successfully but its not approved yet",
+    });
   else res.status(200).send(newData);
 };

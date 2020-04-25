@@ -4,6 +4,7 @@ const auth = require("../../middlewares/auth");
 
 const register = require("./register");
 const login = require("./login");
+const logout = require("./logout");
 const changeInformation = require("./changeInformation");
 const changePassword = require("./changePassword");
 const getAll = require("./getAll");
@@ -23,6 +24,14 @@ module.exports = (app, database) => {
     toggleApprove(req, res, database);
   });
 
+  app.put(
+    `${base_url}/logout`,
+    (req, res, next) => auth(req, res, next, database),
+    CDN.uploadUserPic.none(),
+    (req, res) => {
+      logout(req, res, database);
+    }
+  );
   app.put(
     `${base_url}/change-info`,
     (req, res, next) => auth(req, res, next, database),
