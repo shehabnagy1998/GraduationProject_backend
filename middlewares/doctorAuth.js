@@ -7,7 +7,7 @@ module.exports = async (req, res, next, database) => {
     const token = req.headers.authorization.split(" ")[1];
     if (token) {
       const decodedToken = await jwt.verify(token, process.env.PRIVATE_KEY);
-      if (decodedToken.role_id === "1" || decodedToken.role_id === "2") {
+      if (decodedToken.role_id === "2") {
         let role_type = helpers.setType(decodedToken.role_id);
         let role_category = helpers.setCategory(decodedToken.role_id);
         const userDB = await database(
@@ -25,7 +25,7 @@ module.exports = async (req, res, next, database) => {
     next();
   } catch {
     res.status(401).send({
-      message: "Unauthorized user, doctors and assistants only",
+      message: "Unauthorized user, doctors only",
     });
   }
 };

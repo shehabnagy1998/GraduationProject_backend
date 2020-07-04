@@ -3,33 +3,6 @@ const lo = require("lodash");
 module.exports = async (req, res, database) => {
   let course_code = req.query.course_code;
   let errFlag = false;
-  let errText = "internal server error";
-  let errCode = 500;
-
-  let isCourseExist = async (_) => {
-    try {
-      const res = await database("SELECT * FROM course WHERE code=? LIMIt 1", [
-        course_code,
-      ]);
-      if (res.length >= 1) return true;
-      else return false;
-    } catch (error) {
-      console.log(error);
-      errFlag = true;
-    }
-  };
-
-  let unAssignAssistant = async (assisCode) => {
-    try {
-      const res = await database(
-        "DELETE FROM assistant_course WHERE course_code=?",
-        [course_code]
-      );
-    } catch (error) {
-      console.log(error);
-      errFlag = true;
-    }
-  };
 
   let getCoursesAssisArr = async () => {
     try {
@@ -53,19 +26,6 @@ module.exports = async (req, res, database) => {
 
   //////////////////////////////////////////////////////////////////////////////////
 
-  if (!course_code) {
-    res.status(400).send({
-      message: `${!course_code ? "course_code" : ""} is missing`,
-    });
-    return;
-  }
-
-  if (!(await isCourseExist())) {
-    res.status(400).send({ message: `course not exist` });
-    return;
-  }
-
-  await unAssignAssistant();
   let data = await getCoursesAssisArr();
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });

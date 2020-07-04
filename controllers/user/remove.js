@@ -13,6 +13,7 @@ module.exports = async (req, res, database) => {
       const res = await database(`SELECT code FROM ${role_type} WHERE code=?`, [
         code,
       ]);
+      console.log(role_type, code, role_id);
       if (res.length >= 1) {
         {
           userInfo = res[0];
@@ -66,9 +67,9 @@ module.exports = async (req, res, database) => {
   ///////////////////////////////////////////////////////////////////
 
   // check for valid incoming varaibles
-  if (!role_id) {
+  if (!role_id || !code) {
     res.status(400).send({
-      message: `${!role_id ? "role_id" : ""} is missing`,
+      message: `${!role_id ? "role_id" : !code ? "code" : ""} is missing`,
     });
     return;
   }

@@ -1,6 +1,9 @@
 const base_url = "/api/user";
 const CDN = require("../../utils/CDN");
+const adminAuth = require("../../middlewares/adminAuth");
 const auth = require("../../middlewares/auth");
+const doctorAuth = require("../../middlewares/doctorAuth");
+const docAndAssisAndStuAuth = require("../../middlewares/docAndAssisAndStuAuth");
 
 const register = require("./register");
 const login = require("./login");
@@ -20,9 +23,14 @@ module.exports = (app, database) => {
     login(req, res, database);
   });
 
-  app.put(`${base_url}/toggleApprove`, CDN.uploadUserPic.none(), (req, res) => {
-    toggleApprove(req, res, database);
-  });
+  app.put(
+    `${base_url}/toggleApprove`,
+    (req, res, next) => adminAuth(req, res, next, database),
+    CDN.uploadUserPic.none(),
+    (req, res) => {
+      toggleApprove(req, res, database);
+    }
+  );
 
   app.put(
     `${base_url}/logout`,
@@ -54,7 +62,11 @@ module.exports = (app, database) => {
     getAll(req, res, database);
   });
 
-  app.delete(`${base_url}/remove`, (req, res) => {
-    remove(req, res, database);
-  });
+  app.delete(
+    `${base_url}/remove`,
+    (req, res, next) => adminAuth(req, res, next, database),
+    (req, res) => {
+      remove(req, res, database);
+    }
+  );
 };

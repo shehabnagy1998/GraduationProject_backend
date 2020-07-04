@@ -1,6 +1,6 @@
 const base_url = "/api/post";
 const CDN = require("../../utils/CDN");
-const auth = require("../../middlewares/auth");
+const docAndAssisAndStuAuth = require("../../middlewares/docAndAssisAndStuAuth");
 
 const getAll = require("./getAll");
 const add = require("./add");
@@ -12,7 +12,7 @@ const getAllSaved = require("./getAllSaved");
 module.exports = (app, database) => {
   app.post(
     `${base_url}/add`,
-    (req, res, next) => auth(req, res, next, database),
+    (req, res, next) => docAndAssisAndStuAuth(req, res, next, database),
     CDN.uploadPostPic.array("files"),
     (req, res) => {
       add(req, res, database);
@@ -21,7 +21,7 @@ module.exports = (app, database) => {
 
   app.put(
     `${base_url}/edit`,
-    (req, res, next) => auth(req, res, next, database),
+    (req, res, next) => docAndAssisAndStuAuth(req, res, next, database),
     CDN.uploadPostPic.array("files", 10),
     (req, res) => {
       edit(req, res, database);
@@ -30,7 +30,7 @@ module.exports = (app, database) => {
 
   app.put(
     `${base_url}/toggleSavePost`,
-    (req, res, next) => auth(req, res, next, database),
+    (req, res, next) => docAndAssisAndStuAuth(req, res, next, database),
     CDN.uploadPostPic.none(),
     (req, res) => {
       toggleSavePost(req, res, database);
@@ -39,7 +39,7 @@ module.exports = (app, database) => {
 
   app.get(
     `${base_url}/getAll`,
-    (req, res, next) => auth(req, res, next, database),
+    (req, res, next) => docAndAssisAndStuAuth(req, res, next, database),
     (req, res) => {
       getAll(req, res, database);
     }
@@ -47,7 +47,7 @@ module.exports = (app, database) => {
 
   app.get(
     `${base_url}/getAllSaved`,
-    (req, res, next) => auth(req, res, next, database),
+    (req, res, next) => docAndAssisAndStuAuth(req, res, next, database),
     (req, res) => {
       getAllSaved(req, res, database);
     }
@@ -55,7 +55,7 @@ module.exports = (app, database) => {
 
   app.delete(
     `${base_url}/remove`,
-    (req, res, next) => auth(req, res, next, database),
+    (req, res, next) => docAndAssisAndStuAuth(req, res, next, database),
     (req, res) => {
       remove(req, res, database);
     }

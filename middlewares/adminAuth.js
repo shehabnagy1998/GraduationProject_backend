@@ -23,7 +23,7 @@ module.exports = async (req, res, next, database) => {
     next();
   } catch {
     res.status(401).send({
-      message: "Unauthorized user, admin only",
+      message: "Unauthorized user, admins only",
     });
   }
 };

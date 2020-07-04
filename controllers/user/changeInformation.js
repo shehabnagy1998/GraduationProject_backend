@@ -49,9 +49,11 @@ module.exports = async (req, res, database) => {
   const isEmailExist = async (_) => {
     try {
       const res = await database(
-        `SELECT email FROM ${role_type} WHERE email=?`,
-        [email]
+        `SELECT email,code FROM ${role_type} WHERE email=? AND code!=?`,
+        [email, user.code]
       );
+      console.log(res);
+      console.log(user.code);
       if (res.length >= 1 && email !== user.email) return true;
       else return false;
     } catch (error) {

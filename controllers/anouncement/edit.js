@@ -2,10 +2,12 @@ let CDN = require("../../utils/CDN");
 
 module.exports = async (req, res, database) => {
   let id = req.body.id;
+  let title = req.body.title;
   let text = req.body.text;
   let errFlag = false;
   let user = res.locals.user;
   let anounce;
+  let io = res.locals.io;
 
   const isExist = async (_) => {
     try {
@@ -22,8 +24,8 @@ module.exports = async (req, res, database) => {
 
   let insertUpdate = async (_) => {
     try {
-      let query = "UPDATE announcement SET text=?, admin_code=?";
-      let params = [text, user.code];
+      let query = "UPDATE announcement SET text=?, title=?, admin_code=?";
+      let params = [text, title, user.code];
       if (req.file) {
         CDN.remove(anounce.image);
         let image = req.file.path.replace(/\\/g, "/");
@@ -51,9 +53,9 @@ module.exports = async (req, res, database) => {
 
   /////////////////////////////////////////////////////////////////////////////////
 
-  if (!text) {
+  if (!text || !title) {
     res.status(400).send({
-      message: `${!text ? "text" : ""} is missing`,
+      message: `${!title ? "title" : !text ? "text" : ""} is missing`,
     });
     return;
   }
@@ -67,6 +69,7 @@ module.exports = async (req, res, database) => {
 
   await insertUpdate();
   const newData = await getAll();
+  io.sockets.emit("NOTIFICATION", newData);
 
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });

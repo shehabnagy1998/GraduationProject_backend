@@ -1,6 +1,7 @@
 module.exports = async (req, res, database) => {
   let id = req.query.id;
   let errFlag = false;
+  let io = res.locals.io;
 
   let isExist = async (_) => {
     try {
@@ -51,6 +52,7 @@ module.exports = async (req, res, database) => {
 
   await remove();
   const newData = await getAll();
+  io.sockets.emit("NOTIFICATION", newData);
 
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });

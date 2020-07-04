@@ -21,8 +21,8 @@ module.exports = async (req, res, database) => {
       );
       if (res.length >= 1) {
         {
-          console.log(res[0].password);
           userInfo = res[0];
+          console.log(res);
           return true;
         }
       } else return false;
