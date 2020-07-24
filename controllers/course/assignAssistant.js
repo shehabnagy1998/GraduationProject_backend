@@ -33,7 +33,6 @@ module.exports = async (req, res, database) => {
   };
   let isAssistantExist = async (assisCode) => {
     try {
-      console.log(assisCode);
       const res = await database(
         "SELECT * FROM assistant WHERE code=? LIMIt 1",
         [assisCode]

@@ -4,8 +4,10 @@ const CDN = require("../../utils/CDN");
 const adminAuth = require("../../middlewares/adminAuth");
 const auth = require("../../middlewares/auth");
 const doctorAuth = require("../../middlewares/doctorAuth");
+const docAndAssisAndStuAuth = require("../../middlewares/docAndAssisAndStuAuth");
 
 const getAll = require("./getAll");
+const getAllFor = require("./getAllFor");
 const add = require("./add");
 const remove = require("./remove");
 const edit = require("./edit");
@@ -57,6 +59,13 @@ module.exports = (app, database) => {
     (req, res, next) => auth(req, res, next, database),
     (req, res) => {
       getAll(req, res, database);
+    }
+  );
+  app.get(
+    `${base_url}/getAllFor`,
+    (req, res, next) => docAndAssisAndStuAuth(req, res, next, database),
+    (req, res) => {
+      getAllFor(req, res, database);
     }
   );
 

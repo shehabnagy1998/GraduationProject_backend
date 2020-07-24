@@ -93,7 +93,10 @@ module.exports = async (req, res, database) => {
         expiresIn: "2190h",
       });
       userInfo.token = token;
-      const res = await database(`UPDATE ${role_type} SET token=?`, [token]);
+      const res = await database(
+        `UPDATE ${role_type} SET token=? WHERE email=?`,
+        [token, email]
+      );
     } catch (error) {
       console.log(error);
       errFlag = true;

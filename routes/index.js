@@ -7,6 +7,7 @@ const anouncementController = require("../controllers/anouncement");
 const assignmentForTeachStuffController = require("../controllers/assignmentForTeachStuff");
 const assignmentForStudentsController = require("../controllers/assignmentForStudents");
 const postController = require("../controllers/post");
+const helpController = require("../controllers/help");
 
 module.exports = (app, database) => {
   userController(app, database);
@@ -18,4 +19,5 @@ module.exports = (app, database) => {
   assignmentForTeachStuffController(app, database);
   assignmentForStudentsController(app, database);
   postController(app, database);
+  helpController(app, database);
 };

@@ -8,9 +8,9 @@ module.exports = async (req, res, next, database) => {
     if (token) {
       const decodedToken = await jwt.verify(token, process.env.PRIVATE_KEY);
       if (
-        decodedToken.role_id === "0" ||
-        decodedToken.role_id === "1" ||
-        decodedToken.role_id === "2"
+        decodedToken.role_id == "0" ||
+        decodedToken.role_id == "1" ||
+        decodedToken.role_id == "2"
       ) {
         let role_type = helpers.setType(decodedToken.role_id);
         let role_category = helpers.setCategory(decodedToken.role_id);

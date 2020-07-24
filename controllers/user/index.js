@@ -16,11 +16,11 @@ const toggleApprove = require("./toggleApprove");
 
 module.exports = (app, database) => {
   app.post(`${base_url}/register`, CDN.uploadUserPic.none(), (req, res) => {
-    register(req, res, database);
+    CDN.uploadUserPic.none(), register(req, res, database);
   });
 
   app.put(`${base_url}/login`, CDN.uploadUserPic.none(), (req, res) => {
-    login(req, res, database);
+    CDN.uploadUserPic.none(), login(req, res, database);
   });
 
   app.put(

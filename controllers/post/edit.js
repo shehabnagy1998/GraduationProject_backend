@@ -78,7 +78,6 @@ module.exports = async (req, res, database) => {
 
   let insertNewHelper = async (data, post_id) => {
     try {
-      console.log(req.files);
       const res = await database(
         `INSERT INTO post_data (data, post_id) VALUE (?,?)`,
         [data, post_id]

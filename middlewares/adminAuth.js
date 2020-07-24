@@ -8,7 +8,7 @@ module.exports = async (req, res, next, database) => {
     if (token) {
       const decodedToken = await jwt.verify(token, process.env.PRIVATE_KEY);
       console.log(decodedToken);
-      if (decodedToken.role_id === "3") {
+      if (decodedToken.role_id == "3") {
         let role_type = helpers.setType(decodedToken.role_id);
         const userDB = await database(
           `SELECT * FROM admin WHERE token=? LIMIT 1`,
