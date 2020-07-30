@@ -7,7 +7,7 @@ module.exports = async (req, res, database) => {
   let getAllStudent = async (_) => {
     try {
       const res = await database(
-        "SELECT course.* FROM course, student_course WHERE course.code=student_course.course_code AND student_course.student_code=?",
+        "SELECT * FROM course, student_course WHERE course.code=student_course.course_code AND student_course.student_code=?",
         [user.code]
       );
       return res;

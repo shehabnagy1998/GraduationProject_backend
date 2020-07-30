@@ -18,7 +18,7 @@ module.exports = async (req, res, database) => {
   let getByInstitute = async (_) => {
     try {
       const res = await database(
-        "SELECT * FROM department WHERE institute_id=?",
+        "SELECT * FROM department WHERE institute_id=? ORDER BY department.name",
         [institute_id]
       );
       return res;

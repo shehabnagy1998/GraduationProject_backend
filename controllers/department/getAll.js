@@ -4,7 +4,7 @@ module.exports = async (req, res, database) => {
   let getAll = async (_) => {
     try {
       const res = await database(
-        "SELECT department.*, institute.name AS institute_name FROM department, institute WHERE department.institute_id=institute.id"
+        "SELECT department.*, institute.name AS institute_name FROM department, institute WHERE department.institute_id=institute.id ORDER BY department.name"
       );
       return res;
     } catch (error) {

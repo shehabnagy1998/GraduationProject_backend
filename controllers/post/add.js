@@ -23,14 +23,34 @@ module.exports = async (req, res, database) => {
 
   let insertNew = async (_) => {
     try {
+      let data_type = "none";
+      console.log(req.files);
+      if (req.files && req.files.length >= 1) {
+        if (req.files.length > 1) {
+          data_type = "multiple";
+        } else {
+          let file = req.files[0];
+          if (file.mimetype.includes("image")) {
+            data_type = "image";
+          } else if (file.mimetype.includes("video")) {
+            data_type = "video";
+          } else if (file.mimetype.includes("audio")) {
+            data_type = "audio";
+          } else if (file.mimetype.includes("application")) {
+            data_type = "application";
+          } else if (file.mimetype.includes("text")) {
+            data_type = "text";
+          }
+        }
+      }
       const res = await database(
-        `INSERT INTO post (date, content, type, course_code, ${role_type}_code) VALUE (NOW(),?,?,?,?)`,
-        [content, type, course_code, user.code]
+        `INSERT INTO post (date, content, type, course_code, data_type, ${role_type}_code) VALUE (NOW(),?,?,?,?,?)`,
+        [content, type, course_code, data_type, user.code]
       );
-      if (role_id !== "0" && req.files && req.files.length >= 1) {
+      if (req.files && req.files.length >= 1) {
         const post_id = res.insertId;
         for (let i = 0; i < req.files.length; i++) {
-          const element = req.files[i].path.replace(/\\/g, "/");
+          const element = req.files[i];
           await insertNewHelper(element, post_id);
         }
       }
@@ -42,9 +62,10 @@ module.exports = async (req, res, database) => {
 
   let insertNewHelper = async (data, post_id) => {
     try {
+      const path = data.path.replace(/\\/g, "/");
       const res = await database(
-        `INSERT INTO post_data (data, post_id) VALUE (?,?)`,
-        [data, post_id]
+        `INSERT INTO post_data (data,name, post_id) VALUE (?,?,?)`,
+        [path, data.filename, post_id]
       );
     } catch (error) {
       console.log(error);
@@ -66,6 +87,11 @@ module.exports = async (req, res, database) => {
           : ""
       } is missing`,
     });
+    return;
+  }
+
+  if (role_id === "0" && req.files && req.files.length >= 1) {
+    res.status(402).send({ message: `student cannot upload files` });
     return;
   }
 

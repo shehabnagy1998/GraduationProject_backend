@@ -1,6 +1,8 @@
 module.exports = async (req, res, database) => {
   let type = req.query.type;
   let course_code = req.query.course_code;
+  let page = req.query.page;
+  let limit = 5;
   let errFlag = false;
   let role_type = res.locals.role_type;
   let user = res.locals.user;
@@ -21,9 +23,11 @@ module.exports = async (req, res, database) => {
 
   let getAll = async (_) => {
     try {
+      page = page && page >= 1 ? page : 1;
+      let offset = (page - 1) * limit;
       const selectRes = await database(
-        `SELECT post.*, course.name AS course_name FROM post, course WHERE course.code=post.course_code AND course_code=? AND type=?`,
-        [course_code, type]
+        `SELECT post.*, course.name AS course_name FROM post, course WHERE course.code=post.course_code AND course_code=? AND type=? ORDER BY post.date DESC LIMIT ? OFFSET ?`,
+        [course_code, type, limit, offset]
       );
       if (selectRes && selectRes.length >= 1) {
         for (let i = 0; i < selectRes.length; i++) {
@@ -57,7 +61,7 @@ module.exports = async (req, res, database) => {
   let getAllHelper = async (post_id) => {
     try {
       const selectRes = await database(
-        `SELECT data FROM post_data WHERE post_id=?`,
+        `SELECT data,name FROM post_data WHERE post_id=?`,
         [post_id]
       );
       return selectRes;
@@ -80,10 +84,10 @@ module.exports = async (req, res, database) => {
         req_code = post.student_code;
       }
       const selectRes = await database(
-        `SELECT code, name, email,profile_image FROM ${req_type} WHERE code=?`,
+        `SELECT code, name, email,profile_image FROM ${req_type} WHERE code=? LIMIT 1`,
         [req_code]
       );
-      return selectRes;
+      return selectRes[0];
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -92,10 +96,10 @@ module.exports = async (req, res, database) => {
 
   //////////////////////////////////////////////
 
-  if (!type || !course_code) {
+  if (!type || !course_code || !page) {
     res.status(400).send({
       message: `${
-        !type ? "type" : !course_code ? "course_code" : ""
+        !type ? "type" : !course_code ? "course_code" : !page ? "page" : ""
       } is missing`,
     });
     return;

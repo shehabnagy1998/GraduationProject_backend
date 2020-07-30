@@ -5,15 +5,18 @@ module.exports = async (req, res, database) => {
   let errFlag = false;
   let role_type = res.locals.role_type;
   let user = res.locals.user;
+  let total_mark;
 
   let isAssignmentExist = async (_) => {
     try {
       const res = await database(
-        "SELECT id FROM assignment WHERE id=? LIMIt 1",
+        "SELECT total_mark FROM assignment WHERE id=? LIMIt 1",
         [assignment_id]
       );
-      if (res.length >= 1) return true;
-      else return false;
+      if (res.length >= 1) {
+        total_mark = res[0].total_mark;
+        return true;
+      } else return false;
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -46,19 +49,6 @@ module.exports = async (req, res, database) => {
     }
   };
 
-  let getAll = async (_) => {
-    try {
-      const selectRes = await database(
-        `SELECT student.code, student.name, email, phone, assignment_id, mark FROM student, student_assignment WHERE assignment_id=? AND student.code=student_code`,
-        [assignment_id]
-      );
-      return selectRes;
-    } catch (error) {
-      console.log(error);
-      errFlag = true;
-    }
-  };
-
   //////////////////////////////////////////////
 
   if (!assignment_id || !student_code || !mark) {
@@ -80,6 +70,10 @@ module.exports = async (req, res, database) => {
     res.status(400).send({ message: `assignment not exist` });
     return;
   }
+  if (mark > total_mark) {
+    res.status(400).send({ message: `given mark is greater than total mark` });
+    return;
+  }
 
   if (!(await isStudentExist())) {
     res.status(400).send({
@@ -90,11 +84,9 @@ module.exports = async (req, res, database) => {
 
   await assignMark();
 
-  let data = await getAll();
-
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });
     return;
   }
-  res.status(200).send(data);
+  res.status(200).send({ message: "assignment marked" });
 };

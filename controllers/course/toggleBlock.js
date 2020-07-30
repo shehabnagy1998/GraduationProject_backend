@@ -1,6 +1,9 @@
+const moment = require("moment");
+
 module.exports = async (req, res, database) => {
   let student_code = req.body.student_code;
   let course_code = req.body.course_code;
+  let block_period = req.body.block_period;
   let errFlag = false;
   let is_blocked;
 
@@ -47,10 +50,18 @@ module.exports = async (req, res, database) => {
 
   let toggleBlock = async (_) => {
     try {
-      const res = await database(
-        "UPDATE student_course SET is_blocked=? WHERE student_code=? AND course_code=? LIMIt 1",
-        [!is_blocked, student_code, course_code]
-      );
+      let query = `UPDATE student_course SET is_blocked=?, block_period=?, unblock_date=? WHERE student_code=? AND course_code=? LIMIt 1`;
+      let params = [!is_blocked];
+      if (!is_blocked) {
+        let duration = moment.duration(block_period, "d");
+        let unblock_date = moment(new Date())
+          .add(duration)
+          .format("YYYY-MM-DD HH:mm:ss");
+        params = [...params, block_period, unblock_date];
+      } else params = [...params, 0, null];
+      params = [...params, student_code, course_code];
+      console.log(params);
+      const res = await database(query, params);
       if (res.length >= 1) {
         is_blocked = res[0].is_blocked;
         return true;
@@ -63,10 +74,17 @@ module.exports = async (req, res, database) => {
 
   //////////////////////////////////////////////////////////////////////////////////
 
-  if (!student_code || !course_code) {
+  console.log(req.body);
+  if (!student_code || !course_code || !block_period) {
     res.status(400).send({
       message: `${
-        !student_code ? "student_code" : !course_code ? "course_code" : ""
+        !student_code
+          ? "student_code"
+          : !course_code
+          ? "course_code"
+          : !block_period
+          ? "block_period"
+          : ""
       } is missing`,
     });
     return;
@@ -93,9 +111,7 @@ module.exports = async (req, res, database) => {
     res.status(500).send({ message: `internal server error` });
     return;
   }
-  res
-    .status(200)
-    .send({
-      message: `student has been ${!is_blocked ? "blocked" : "unblocked"}`,
-    });
+  res.status(200).send({
+    message: `student has been ${!is_blocked ? "blocked" : "unblocked"}`,
+  });
 };

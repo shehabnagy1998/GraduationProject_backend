@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const helmet = require("helmet");
 const routes = require("./routes");
 const sockets = require("./sockets");
+const cron = require("./cron");
 const corsOptions = {
   origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -32,6 +33,7 @@ module.exports = (database) => {
   // route management
   sockets(io, database);
   routes(app, database);
+  cron(app, database);
 
   // app starting
   http.listen(port, (err) => {

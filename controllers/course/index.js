@@ -7,6 +7,7 @@ const doctorAuth = require("../../middlewares/doctorAuth");
 const docAndAssisAndStuAuth = require("../../middlewares/docAndAssisAndStuAuth");
 
 const getAll = require("./getAll");
+const getAllStudents = require("./getAllStudents");
 const getAllFor = require("./getAllFor");
 const add = require("./add");
 const remove = require("./remove");
@@ -16,6 +17,7 @@ const assignAssistant = require("./assignAssistant");
 const unAssignAssistant = require("./unAssignAssistant");
 const listAssistants = require("./listAssistants");
 const listAll = require("./listAll");
+const getBlockData = require("./getBlockData");
 
 module.exports = (app, database) => {
   app.post(
@@ -68,6 +70,13 @@ module.exports = (app, database) => {
       getAllFor(req, res, database);
     }
   );
+  app.get(
+    `${base_url}/getAllStudents`,
+    (req, res, next) => doctorAuth(req, res, next, database),
+    (req, res) => {
+      getAllStudents(req, res, database);
+    }
+  );
 
   app.get(
     `${base_url}/listAssistants`,
@@ -81,6 +90,13 @@ module.exports = (app, database) => {
     (req, res, next) => adminAuth(req, res, next, database),
     (req, res) => {
       listAll(req, res, database);
+    }
+  );
+  app.get(
+    `${base_url}/getBlockData`,
+    (req, res, next) => doctorAuth(req, res, next, database),
+    (req, res) => {
+      getBlockData(req, res, database);
     }
   );
 

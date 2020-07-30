@@ -2,16 +2,21 @@ module.exports = async (req, res, database) => {
   let errFlag = false;
   let role_type = res.locals.role_type;
   let user = res.locals.user;
+  let page = req.query.page;
+  let limit = 5;
 
   let getAll = async (_) => {
     try {
+      page = page && page >= 1 ? page : 1;
+      let offset = (page - 1) * limit;
       const selectRes = await database(
-        `SELECT post.*, course.name AS course_name FROM post, course, saved_post WHERE course.code=post.course_code AND post.id=saved_post.post_id AND saved_post.${role_type}_code=?`,
-        [user.code]
+        `SELECT post.*, course.name AS course_name FROM saved_post, post, course WHERE course.code=post.course_code AND post.id=saved_post.post_id AND saved_post.${role_type}_code=? ORDER BY post.date DESC LIMIT ? OFFSET ?`,
+        [user.code, limit, offset]
       );
       if (selectRes && selectRes.length >= 1) {
         for (let i = 0; i < selectRes.length; i++) {
           const element = selectRes[i];
+          selectRes[i].is_saved = 1;
           selectRes[i].files = await getAllHelper(element.id);
           selectRes[i].owner = await getAllHelper2(element);
         }
@@ -26,7 +31,7 @@ module.exports = async (req, res, database) => {
   let getAllHelper = async (post_id) => {
     try {
       const selectRes = await database(
-        `SELECT data FROM post_data WHERE post_id=?`,
+        `SELECT data, name FROM post_data WHERE post_id=?`,
         [post_id]
       );
       return selectRes;
@@ -60,6 +65,13 @@ module.exports = async (req, res, database) => {
   };
 
   //////////////////////////////////////////////
+
+  if (!page) {
+    res.status(400).send({
+      message: `${!page ? "page" : ""} is missing`,
+    });
+    return;
+  }
 
   let data = await getAll();
 

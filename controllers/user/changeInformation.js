@@ -6,7 +6,6 @@ module.exports = async (req, res, database) => {
   let name = req.body.name;
   let email = req.body.email;
   let phone = req.body.phone;
-  let newData = {};
   let user = res.locals.user;
   let role_type = res.locals.role_type;
   let errFlag = false;
@@ -14,7 +13,6 @@ module.exports = async (req, res, database) => {
   let insertData = async (_) => {
     try {
       let params = [email, name, phone];
-      newData = { email, name, phone };
       let query = `UPDATE ${role_type} SET email=?, name=?, phone=?`;
       if (email !== user.email) {
         user.token = await jwt.sign(
@@ -25,21 +23,25 @@ module.exports = async (req, res, database) => {
           }
         );
         params = [...params, user.token];
-        newData.token = user.token;
         query += ", token=?";
       }
 
       if (req.file) {
         CDN.remove(user.profile_image);
-        newData.profile_image = req.file.path.replace(/\\/g, "/");
-        params = [...params, newData.profile_image];
+        let profile_image = req.file.path.replace(/\\/g, "/");
+        params = [...params, profile_image];
         query += ", profile_image=? ";
       }
       params = [...params, user.code];
       query += "WHERE code=?";
 
       const res = await database(query, params);
-      return newData;
+      const data = await database(
+        `SELECT * FROM ${role_type} WHERE code=? LIMIT 1`,
+        [user.code]
+      );
+      data[0].role_type = role_type;
+      return data[0];
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -54,6 +56,21 @@ module.exports = async (req, res, database) => {
       );
       console.log(user.code);
       if (res.length >= 1 && email !== user.email) return true;
+      else return false;
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+
+  const isNameExist = async (_) => {
+    try {
+      const res = await database(
+        `SELECT name,code FROM ${role_type} WHERE name=? AND code!=?`,
+        [name, user.code]
+      );
+      console.log(user.code);
+      if (res.length >= 1 && name !== user.name) return true;
       else return false;
     } catch (error) {
       console.log(error);
@@ -89,7 +106,14 @@ module.exports = async (req, res, database) => {
 
   if (await isEmailExist()) {
     res.status(400).send({
-      message: `email already exist`,
+      message: `email address already exist`,
+    });
+    return;
+  }
+
+  if (await isNameExist()) {
+    res.status(400).send({
+      message: `name already exist`,
     });
     return;
   }

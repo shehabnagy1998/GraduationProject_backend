@@ -3,7 +3,7 @@ module.exports = async (req, res, database) => {
 
   let getAll = async (_) => {
     try {
-      const res = await database("SELECT * FROM institute ");
+      const res = await database("SELECT * FROM institute ORDER BY name");
       return res;
     } catch (error) {
       console.log(error);

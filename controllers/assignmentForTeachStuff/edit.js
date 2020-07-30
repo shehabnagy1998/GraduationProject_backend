@@ -71,7 +71,7 @@ module.exports = async (req, res, database) => {
       if (req.files && req.files.length >= 1) {
         await deleteOld();
         for (let i = 0; i < req.files.length; i++) {
-          const element = req.files[i].path.replace(/\\/g, "/");
+          const element = req.files[i];
           await insertNewHelper(element, id);
         }
       }
@@ -105,37 +105,12 @@ module.exports = async (req, res, database) => {
 
   let insertNewHelper = async (data, assignment_id) => {
     try {
-      console.log(req.files);
+      const path = data.path.replace(/\\/g, "/");
+
       const res = await database(
-        `INSERT INTO assignment_data (data, assignment_id) VALUE (?,?)`,
-        [data, assignment_id]
+        `INSERT INTO assignment_data (data, name, assignment_id) VALUE (?,?,?)`,
+        [path, data.filename, assignment_id]
       );
-    } catch (error) {
-      console.log(error);
-      errFlag = true;
-    }
-  };
-
-  let getAllAnswerd = async (_) => {
-    try {
-      const selectRes = await database(
-        `SELECT assignment.*, course.name AS course_name FROM assignment, student_assignment, course WHERE assignment.${role_type}_code=? AND assignment.id=assignment_id AND course.code=assignment.course_code`,
-        [user.code]
-      );
-      return selectRes;
-    } catch (error) {
-      console.log(error);
-      errFlag = true;
-    }
-  };
-
-  let getAllNotAnswerd = async (_) => {
-    try {
-      const selectRes = await database(
-        `SELECT assignment.*, course.name AS course_name FROM assignment, student_assignment, course WHERE assignment.${role_type}_code=? AND assignment.id!=assignment_id AND course.code=assignment.course_code`,
-        [user.code]
-      );
-      return selectRes;
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -181,12 +156,10 @@ module.exports = async (req, res, database) => {
   }
 
   await insertUpdate();
-  let dataAnswerd = await getAllAnswerd();
-  let dataNotAnswerd = await getAllNotAnswerd();
 
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });
     return;
   }
-  res.status(200).send({ answerd: dataAnswerd, not_answerd: dataNotAnswerd });
+  res.status(200).send({ message: "assignment edited successfully" });
 };

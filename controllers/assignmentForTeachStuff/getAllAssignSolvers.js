@@ -3,6 +3,8 @@ module.exports = async (req, res, database) => {
   let errFlag = false;
   let role_type = res.locals.role_type;
   let user = res.locals.user;
+  let page = req.query.page;
+  let limit = 5;
 
   let isAssignmentExist = async (_) => {
     try {
@@ -34,9 +36,27 @@ module.exports = async (req, res, database) => {
 
   let getAll = async (_) => {
     try {
+      page = page && page >= 1 ? page : 1;
+      let offset = (page - 1) * limit;
       const selectRes = await database(
-        `SELECT student.code, student.name, email, phone, assignment_id, mark FROM student, student_assignment WHERE assignment_id=? AND student.code=student_code`,
-        [assignment_id]
+        `SELECT student.code, student.name, email, phone, assignment_id, mark, assignment.total_mark AS assignment_mark FROM assignment, student, student_assignment WHERE assignment_id=? AND student.code=student_code AND assignment.id=assignment_id LIMIT ? OFFSET ?`,
+        [assignment_id, limit, offset]
+      );
+      for (let i = 0; i < selectRes.length; i++) {
+        const element = selectRes[i];
+        element.files = await getAllHelper(assignment_id, element.code);
+      }
+      return selectRes;
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+  let getAllHelper = async (assignment_id, student_code) => {
+    try {
+      const selectRes = await database(
+        `SELECT data, name FROM student_assignment_data WHERE assignment_id=? AND student_code=?`,
+        [assignment_id, student_code]
       );
       return selectRes;
     } catch (error) {
@@ -60,9 +80,7 @@ module.exports = async (req, res, database) => {
   }
 
   if (!(await isSolved())) {
-    res.status(400).send({
-      message: `assignment wasn't solve by any one yet`,
-    });
+    res.status(200).send([]);
     return;
   }
 

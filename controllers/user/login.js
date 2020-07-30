@@ -1,7 +1,6 @@
 let jwt = require("jsonwebtoken");
 let bcrypt = require("bcrypt");
 
-let DATA = require("../../utils/DATA");
 let helpers = require("../../utils/helpers");
 
 module.exports = async (req, res, database) => {
@@ -22,7 +21,6 @@ module.exports = async (req, res, database) => {
       if (res.length >= 1) {
         {
           userInfo = res[0];
-          console.log(res);
           return true;
         }
       } else return false;
@@ -36,8 +34,10 @@ module.exports = async (req, res, database) => {
     try {
       let hashedPass = userInfo.password;
       let result = await bcrypt.compare(password, hashedPass);
-      if (result) return true;
-      else return false;
+      if (result) {
+        delete userInfo.password;
+        return true;
+      } else return false;
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -114,7 +114,6 @@ module.exports = async (req, res, database) => {
     });
     return;
   }
-
   role_type = helpers.setType(role_id);
   if (!(await isEmailExist())) {
     res.status(400).send({
@@ -135,10 +134,11 @@ module.exports = async (req, res, database) => {
     });
     return;
   }
-
   await insertData();
   await getDepartment();
   await getGradeYear();
+  userInfo.role_type = role_type;
+  console.log(userInfo);
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });
     return;
