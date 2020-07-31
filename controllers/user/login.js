@@ -1,5 +1,5 @@
 let jwt = require("jsonwebtoken");
-let bcrypt = require("bcrypt");
+let bcrypt = require("bcryptjs");
 
 let helpers = require("../../utils/helpers");
 

@@ -1,5 +1,5 @@
 let DATA = require("../../utils/DATA");
-let bcrypt = require("bcrypt");
+let bcrypt = require("bcryptjs");
 
 module.exports = async (req, res, database) => {
   let old_password = req.body.old_password;
