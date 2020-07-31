@@ -21,7 +21,7 @@ const uploadUserPic = multer({
         null,
         file.originalname
           .toLowerCase()
-          .replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ")
+          .replace(/[`~!@#$%^&*()_|+\-=?;:'",<>\{\}\[\]\\\/]/gi, " ")
       ),
   }),
 });
@@ -35,7 +35,7 @@ const uploadAssignmentPic = multer({
         null,
         file.originalname
           .toLowerCase()
-          .replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ")
+          .replace(/[`~!@#$%^&*()_|+\-=?;:'",<>\{\}\[\]\\\/]/gi, " ")
       ),
   }),
 });
@@ -49,7 +49,7 @@ const uploadAssignmentAnswerPic = multer({
         null,
         file.originalname
           .toLowerCase()
-          .replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ")
+          .replace(/[`~!@#$%^&*()_|+\-=?;:'",<>\{\}\[\]\\\/]/gi, " ")
       ),
   }),
 });
@@ -62,7 +62,7 @@ const uploadPostPic = multer({
         null,
         file.originalname
           .toLowerCase()
-          .replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, " ")
+          .replace(/[`~!@#$%^&*()_|+\-=?;:'",<>\{\}\[\]\\\/]/gi, " ")
       ),
   }),
 });
