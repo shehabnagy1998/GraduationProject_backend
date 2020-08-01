@@ -32,7 +32,7 @@ module.exports = async (req, res, database) => {
 
   let getAll = async (_) => {
     try {
-      const res = await database(`SELECT * FROM help WHERE solution IS NULL`);
+      const res = await database(`SELECT * FROM help`);
       return res;
     } catch (error) {
       console.log(error);
@@ -57,11 +57,10 @@ module.exports = async (req, res, database) => {
   }
 
   await insertUpdate();
-  const newData = await getAll();
 
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });
     return;
   }
-  res.status(200).send(newData);
+  res.status(200).send({ message: "help request has been solved" });
 };

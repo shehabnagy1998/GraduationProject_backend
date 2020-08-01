@@ -2,6 +2,7 @@ const base_url = "/api/help";
 const CDN = require("../../utils/CDN");
 const adminAuth = require("../../middlewares/adminAuth");
 const docAndAssisAndStuAuth = require("../../middlewares/docAndAssisAndStuAuth");
+const auth = require("../../middlewares/auth");
 
 const getAllFor = require("./getAllFor");
 const add = require("./add");
@@ -29,7 +30,7 @@ module.exports = (app, database) => {
 
   app.get(
     `${base_url}/getAllFor`,
-    (req, res, next) => docAndAssisAndStuAuth(req, res, next, database),
+    (req, res, next) => auth(req, res, next, database),
     (req, res) => {
       getAllFor(req, res, database);
     }

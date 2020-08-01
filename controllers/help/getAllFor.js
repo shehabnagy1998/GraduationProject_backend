@@ -6,9 +6,26 @@ module.exports = async (req, res, database) => {
 
   let getAll = async (_) => {
     try {
-      const res = await database(
-        `SELECT * FROM help WHERE solution IS NULL ORDER BY solution`
-      );
+      const res = await database(`SELECT * FROM help ORDER BY solution`);
+      for (let i = 0; i < res.length; i++) {
+        const element = res[i];
+        if (element.student_code) {
+          element.issuer = await database(
+            `SELECT name FROM student WHERE code=${element.student_code}`
+          );
+          element.issuer = element.issuer[0].name;
+        } else if (element.doctor_code) {
+          element.issuer = await database(
+            `SELECT name FROM doctor WHERE code=${element.doctor_code}`
+          );
+          element.issuer = element.issuer[0].name;
+        } else if (element.assistant_code) {
+          element.issuer = await database(
+            `SELECT name FROM assistant WHERE code=${element.assistant_code}`
+          );
+          element.issuer = element.issuer[0].name;
+        }
+      }
       return res;
     } catch (error) {
       console.log(error);
@@ -18,7 +35,7 @@ module.exports = async (req, res, database) => {
   let getAllFor = async (_) => {
     try {
       const res = await database(
-        `SELECT * FROM help WHERE ${role_type}_code=?`,
+        `SELECT * FROM help WHERE ${role_type}_code=?  ORDER BY solution`,
         [user.code]
       );
       return res;
