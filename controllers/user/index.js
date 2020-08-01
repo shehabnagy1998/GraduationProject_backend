@@ -12,6 +12,7 @@ const changePassword = require("./changePassword");
 const getAll = require("./getAll");
 const remove = require("./remove");
 const toggleApprove = require("./toggleApprove");
+const downloadZIP = require("./downloadZIP");
 
 module.exports = (app, database) => {
   app.post(`${base_url}/register`, CDN.uploadUserPic.none(), (req, res) => {
@@ -63,6 +64,15 @@ module.exports = (app, database) => {
     CDN.uploadUserPic.none(),
     (req, res) => {
       changePassword(req, res, database);
+    }
+  );
+
+  app.put(
+    `${base_url}/downloadZIP`,
+    (req, res, next) => auth(req, res, next, database),
+    CDN.uploadUserPic.none(),
+    (req, res) => {
+      downloadZIP(req, res, database);
     }
   );
 

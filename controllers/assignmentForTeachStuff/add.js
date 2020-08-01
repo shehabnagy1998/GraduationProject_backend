@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 module.exports = async (req, res, database) => {
   let content = req.body.content;
   let deadline = req.body.deadline;
@@ -24,9 +26,11 @@ module.exports = async (req, res, database) => {
 
   let insertNew = async (_) => {
     try {
+      let dateNow = moment().format("YYYY-MM-DD HH:mm:ss");
       const res = await database(
-        `INSERT INTO assignment (date, content, type,total_mark, deadline, course_code, ${role_type}_code) VALUE (NOW(),?,?,?,?,?,?)`,
+        `INSERT INTO assignment (date, content, type,total_mark, deadline, course_code, ${role_type}_code) VALUE (?,?,?,?,?,?,?)`,
         [
+          dateNow,
           content,
           role_id,
           total_mark,

@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 module.exports = async (req, res, database) => {
   let content = req.body.content;
   let course_code = req.body.course_code;
@@ -43,9 +45,11 @@ module.exports = async (req, res, database) => {
           }
         }
       }
+      let dateNow = moment().format("YYYY-MM-DD HH:mm:ss");
+
       const res = await database(
-        `INSERT INTO post (date, content, type, course_code, data_type, ${role_type}_code) VALUE (NOW(),?,?,?,?,?)`,
-        [content, type, course_code, data_type, user.code]
+        `INSERT INTO post (date, content, type, course_code, data_type, ${role_type}_code) VALUE (?,?,?,?,?,?)`,
+        [dateNow, content, type, course_code, data_type, user.code]
       );
       if (req.files && req.files.length >= 1) {
         const post_id = res.insertId;

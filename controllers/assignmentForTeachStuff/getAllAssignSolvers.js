@@ -39,7 +39,7 @@ module.exports = async (req, res, database) => {
       page = page && page >= 1 ? page : 1;
       let offset = (page - 1) * limit;
       const selectRes = await database(
-        `SELECT student.code, student.name, email, phone, assignment_id, mark, assignment.total_mark AS assignment_mark FROM assignment, student, student_assignment WHERE assignment_id=? AND student.code=student_code AND assignment.id=assignment_id LIMIT ? OFFSET ?`,
+        `SELECT student.code, student.name, email, phone, student_assignment.content AS solve_content, assignment_id, mark, assignment.total_mark AS assignment_mark FROM assignment, student, student_assignment WHERE assignment_id=? AND student.code=student_code AND assignment.id=assignment_id LIMIT ? OFFSET ?`,
         [assignment_id, limit, offset]
       );
       for (let i = 0; i < selectRes.length; i++) {
