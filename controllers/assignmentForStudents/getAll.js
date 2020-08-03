@@ -11,13 +11,13 @@ module.exports = async (req, res, database) => {
       page = page && page >= 1 ? page : 1;
       let offset = (page - 1) * limit;
       const selectRes = await database(
-        `SELECT * FROM assignment WHERE course_code IN (SELECT code FROM course WHERE grade_year_id=? AND department_id=?) AND assignment.id NOT IN (SELECT assignment_id FROM student_assignment WHERE student_code=?) AND DATE(assignment.deadline) > NOW() ORDER BY assignment.date DESC LIMIT ? OFFSET ?`,
+        `SELECT assignment.*, course.name AS course_name FROM assignment, course WHERE course_code IN (SELECT code FROM course WHERE grade_year_id=? AND department_id=?) AND assignment.id NOT IN (SELECT assignment_id FROM student_assignment WHERE student_code=?) AND course.code=assignment.course_code AND DATE(assignment.deadline) > NOW() ORDER BY assignment.date DESC LIMIT ? OFFSET ?`,
         [user.grade_year_id, user.department_id, user.code, limit, offset]
       );
       for (let i = 0; i < selectRes.length; i++) {
         const element = selectRes[i];
 
-        selectRes[i].course = await getAllHelper(element.course_code);
+        // selectRes[i].solution = await getAllHelper(element.id);
         selectRes[i].files = await getAllHelper2(element.id, user.code);
         delete selectRes[i].course_code;
       }
@@ -33,13 +33,13 @@ module.exports = async (req, res, database) => {
       page = page && page >= 1 ? page : 1;
       let offset = (page - 1) * limit;
       const selectRes = await database(
-        `SELECT * FROM assignment WHERE course_code IN (SELECT code FROM course WHERE grade_year_id=? AND department_id=?) AND assignment.id IN (SELECT assignment_id FROM student_assignment WHERE student_code=?) AND DATE(assignment.deadline) > NOW() ORDER BY assignment.date DESC LIMIT ? OFFSET ?`,
+        `SELECT assignment.*, course.name AS course_name FROM assignment, course WHERE course_code IN (SELECT code FROM course WHERE grade_year_id=? AND department_id=?) AND assignment.id IN (SELECT assignment_id FROM student_assignment WHERE student_code=?)AND course.code=assignment.course_code  AND DATE(assignment.deadline) > NOW() ORDER BY assignment.date DESC LIMIT ? OFFSET ?`,
         [user.grade_year_id, user.department_id, user.code, limit, offset]
       );
       for (let i = 0; i < selectRes.length; i++) {
         const element = selectRes[i];
 
-        selectRes[i].course = await getAllHelper(element.course_code);
+        selectRes[i].solution = await getAllHelper(element.id);
         selectRes[i].files = await getAllHelper2(element.id, user.code);
         delete selectRes[i].course_code;
       }
@@ -50,23 +50,30 @@ module.exports = async (req, res, database) => {
     }
   };
 
-  let getAllHelper = async (code) => {
+  let getAllHelper = async (assignment_id) => {
     try {
-      const res = await database(`SELECT name, code FROM course WHERE code=?`, [
-        code,
-      ]);
-      return res[0];
+      let res = await database(
+        `SELECT mark, content FROM student_assignment WHERE assignment_id=? AND student_code=? LIMIT 1`,
+        [assignment_id, user.code]
+      );
+      res = res[0];
+      res.files = await database(
+        `SELECT data,name FROM student_assignment_data WHERE assignment_id=? AND student_code=?`,
+        [assignment_id, user.code]
+      );
+      console.log(res);
+      return res;
     } catch (error) {
       console.log(error);
       errFlag = true;
     }
   };
 
-  let getAllHelper2 = async (assignment_id, student_code) => {
+  let getAllHelper2 = async (assignment_id) => {
     try {
       const selectRes = await database(
-        `SELECT data, name FROM student_assignment_data WHERE assignment_id=? AND student_code=?`,
-        [assignment_id, student_code]
+        `SELECT data, name FROM assignment_data WHERE assignment_id=?`,
+        [assignment_id]
       );
       return selectRes;
     } catch (error) {

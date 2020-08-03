@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 module.exports = async (req, res, database) => {
   let title = req.body.title;
   let text = req.body.text;
@@ -7,11 +9,13 @@ module.exports = async (req, res, database) => {
 
   let insertNew = async (_) => {
     try {
+      let dateNow = moment().format("YYYY-MM-DD HH:mm:ss");
+
       let image = "";
       if (req.file) image = req.file.path.replace(/\\/g, "/");
       const res = await database(
-        "INSERT INTO announcement (title,text,image,admin_code) VALUE (?,?,?,?)",
-        [title, text, image, user.code]
+        "INSERT INTO announcement (date,title,text,image,admin_code) VALUE (?,?,?,?,?)",
+        [dateNow, title, text, image, user.code]
       );
     } catch (error) {
       console.log(error);

@@ -7,6 +7,7 @@ module.exports = async (req, res, database) => {
   let email = req.body.email;
   let phone = req.body.phone;
   let user = res.locals.user;
+  let role_id = res.locals.role_id;
   let role_type = res.locals.role_type;
   let errFlag = false;
 
@@ -15,8 +16,9 @@ module.exports = async (req, res, database) => {
       let params = [email, name, phone];
       let query = `UPDATE ${role_type} SET email=?, name=?, phone=?`;
       if (email !== user.email) {
+        console.log();
         user.token = await jwt.sign(
-          { email, role_id: res.locals.user.role_id },
+          { email, role_id },
           process.env.PRIVATE_KEY,
           {
             expiresIn: "2190h",
@@ -25,7 +27,7 @@ module.exports = async (req, res, database) => {
         params = [...params, user.token];
         query += ", token=?";
       }
-
+      console.log(user.token);
       if (req.file) {
         CDN.remove(user.profile_image);
         let profile_image = req.file.path.replace(/\\/g, "/");
@@ -35,7 +37,7 @@ module.exports = async (req, res, database) => {
       params = [...params, user.code];
       query += "WHERE code=?";
 
-      const res = await database(query, params);
+      const rese = await database(query, params);
       const data = await database(
         `SELECT * FROM ${role_type} WHERE code=? LIMIT 1`,
         [user.code]
@@ -50,12 +52,12 @@ module.exports = async (req, res, database) => {
 
   const isEmailExist = async (_) => {
     try {
-      const res = await database(
-        `SELECT email,code FROM ${role_type} WHERE email=? AND code!=?`,
+      const ress = await database(
+        `SELECT email,code FROM ${role_type} WHERE email=? AND code=?`,
         [email, user.code]
       );
       console.log(user.code);
-      if (res.length >= 1 && email !== user.email) return true;
+      if (ress.length >= 1 && email !== user.email) return true;
       else return false;
     } catch (error) {
       console.log(error);
@@ -65,12 +67,12 @@ module.exports = async (req, res, database) => {
 
   const isNameExist = async (_) => {
     try {
-      const res = await database(
-        `SELECT name,code FROM ${role_type} WHERE name=? AND code!=?`,
+      const rese = await database(
+        `SELECT name,code FROM ${role_type} WHERE name=? AND code=?`,
         [name, user.code]
       );
       console.log(user.code);
-      if (res.length >= 1 && name !== user.name) return true;
+      if (rese.length >= 1 && name !== user.name) return true;
       else return false;
     } catch (error) {
       console.log(error);
@@ -80,11 +82,11 @@ module.exports = async (req, res, database) => {
 
   const isPhoneExist = async (_) => {
     try {
-      const res = await database(
+      const rese = await database(
         `SELECT phone FROM ${role_type} WHERE phone=?`,
         [phone]
       );
-      if (res.length >= 1 && phone !== user.phone) return true;
+      if (rese.length >= 1 && phone !== user.phone) return true;
       else return false;
     } catch (error) {
       console.log(error);

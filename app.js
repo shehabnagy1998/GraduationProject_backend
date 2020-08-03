@@ -33,7 +33,7 @@ module.exports = (database) => {
   // route management
   sockets(io, database);
   routes(app, database);
-  cron(app, database);
+  cron(app, database, io);
 
   // app starting
   http.listen(port, (err) => {
