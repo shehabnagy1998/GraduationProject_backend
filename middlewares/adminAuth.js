@@ -7,7 +7,6 @@ module.exports = async (req, res, next, database) => {
     const token = req.headers.authorization.split(" ")[1];
     if (token) {
       const decodedToken = await jwt.verify(token, process.env.PRIVATE_KEY);
-      console.log(decodedToken);
       if (decodedToken.role_id == "3") {
         let role_type = helpers.setType(decodedToken.role_id);
         const userDB = await database(
@@ -15,7 +14,7 @@ module.exports = async (req, res, next, database) => {
           [token]
         );
         if (userDB.length >= 1) {
-          res.locals.user = userDB[0];
+          res.locals.user = { ...userDB[0], role_type };
           res.locals.role_type = role_type;
         } else throw new Error("unauthrized");
       } else throw new Error("unauthrized");

@@ -2,6 +2,8 @@ module.exports = async (req, res, database) => {
   let type = req.query.type;
   let course_code = req.query.course_code;
   let page = req.query.page;
+  let text = req.query.text;
+
   let limit = 5;
   let errFlag = false;
   let role_type = res.locals.role_type;
@@ -25,16 +27,27 @@ module.exports = async (req, res, database) => {
     try {
       page = page && page >= 1 ? page : 1;
       let offset = (page - 1) * limit;
-      const selectRes = await database(
-        `SELECT post.*, course.name AS course_name FROM post, course WHERE course.code=post.course_code AND course_code=? AND type=? ORDER BY post.date DESC LIMIT ? OFFSET ?`,
-        [course_code, type, limit, offset]
-      );
+      let modiText = "%";
+      modiText += text + "%";
+      let selectRes;
+      if (text) {
+        selectRes = await database(
+          `SELECT post.*, course.name AS course_name FROM post, course WHERE course.code=post.course_code AND post.content LIKE ? AND course_code=? AND type=? ORDER BY post.date DESC LIMIT ? OFFSET ?`,
+          [modiText, course_code, type, limit, offset]
+        );
+      } else {
+        selectRes = await database(
+          `SELECT post.*, course.name AS course_name FROM post, course WHERE course.code=post.course_code AND course_code=? AND type=? ORDER BY post.date DESC LIMIT ? OFFSET ?`,
+          [course_code, type, limit, offset]
+        );
+      }
       if (selectRes && selectRes.length >= 1) {
         for (let i = 0; i < selectRes.length; i++) {
           const element = selectRes[i];
           selectRes[i].is_saved = await isSaved(element.id);
-          selectRes[i].files = await getAllHelper(element.id);
-          selectRes[i].owner = await getAllHelper2(element);
+          selectRes[i].files = await getPostData(element.id);
+          selectRes[i].owner = await getPostOwner(element);
+          selectRes[i].comments_count = await getAllComments(element.id);
         }
       }
       return selectRes;
@@ -58,9 +71,9 @@ module.exports = async (req, res, database) => {
     }
   };
 
-  let getAllHelper = async (post_id) => {
+  let getPostData = async (post_id) => {
     try {
-      const selectRes = await database(
+      selectRes = await database(
         `SELECT data,name FROM post_data WHERE post_id=?`,
         [post_id]
       );
@@ -70,7 +83,8 @@ module.exports = async (req, res, database) => {
       errFlag = true;
     }
   };
-  let getAllHelper2 = async (post) => {
+
+  let getPostOwner = async (post) => {
     try {
       let req_type, req_code;
       if (post.doctor_code) {
@@ -83,11 +97,25 @@ module.exports = async (req, res, database) => {
         req_type = "student";
         req_code = post.student_code;
       }
-      const selectRes = await database(
+      selectRes = await database(
         `SELECT code, name, email,profile_image FROM ${req_type} WHERE code=? LIMIT 1`,
         [req_code]
       );
-      return selectRes[0];
+      return { ...selectRes[0], role_type: req_type };
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+
+  let getAllComments = async (post_id) => {
+    try {
+      let selectRes = await database(
+        `SELECT COUNT(id) FROM comment WHERE post_id=?`,
+        [post_id]
+      );
+      selectRes = selectRes[0]["COUNT(id)"];
+      return selectRes;
     } catch (error) {
       console.log(error);
       errFlag = true;

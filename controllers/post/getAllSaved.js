@@ -19,6 +19,7 @@ module.exports = async (req, res, database) => {
           selectRes[i].is_saved = 1;
           selectRes[i].files = await getAllHelper(element.id);
           selectRes[i].owner = await getAllHelper2(element);
+          selectRes[i].comments_count = await getAllComments(element.id);
         }
       }
       return selectRes;
@@ -53,17 +54,30 @@ module.exports = async (req, res, database) => {
         req_type = "student";
         req_code = post.student_code;
       }
-      const selectRes = await database(
-        `SELECT code, name, email,profile_image FROM ${req_type} WHERE code=?`,
+      selectRes = await database(
+        `SELECT code, name, email,profile_image FROM ${req_type} WHERE code=? LIMIT 1`,
         [req_code]
       );
-      return selectRes;
+      return { ...selectRes[0], role_type: req_type };
     } catch (error) {
       console.log(error);
       errFlag = true;
     }
   };
 
+  let getAllComments = async (post_id) => {
+    try {
+      let selectRes = await database(
+        `SELECT COUNT(id) FROM comment WHERE post_id=?`,
+        [post_id]
+      );
+      selectRes = selectRes[0]["COUNT(id)"];
+      return selectRes;
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
   //////////////////////////////////////////////
 
   if (!page) {

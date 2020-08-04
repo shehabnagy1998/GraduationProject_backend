@@ -13,7 +13,7 @@ module.exports = async (req, res, next, database) => {
         [token]
       );
       if (userDB.length >= 1) {
-        res.locals.user = userDB[0];
+        res.locals.user = { ...userDB[0], role_type };
         res.locals.role_type = role_type;
         res.locals.role_id = decodedToken.role_id;
       } else throw Error("unauthrized");
