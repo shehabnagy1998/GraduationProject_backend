@@ -61,7 +61,7 @@ module.exports = async (req, res, database) => {
     return;
   }
 
-  if (role_type !== "doctor" || !(await isOwner())) {
+  if (!(await isOwner())) {
     res.status(400).send({
       message: `you are not the owner of the comment`,
     });
