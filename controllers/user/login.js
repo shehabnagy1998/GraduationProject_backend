@@ -18,6 +18,7 @@ module.exports = async (req, res, database) => {
         `SELECT * FROM ${role_type} WHERE email=? LIMIT 1`,
         [email]
       );
+      console.log(res);
       if (res.length >= 1) {
         {
           userInfo = res[0];
