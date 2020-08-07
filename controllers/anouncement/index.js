@@ -1,6 +1,7 @@
 const base_url = "/api/announcement";
 const CDN = require("../../utils/CDN");
 const adminAuth = require("../../middlewares/adminAuth");
+const auth = require("../../middlewares/auth");
 
 const getAll = require("./getAll");
 const add = require("./add");
@@ -26,9 +27,13 @@ module.exports = (app, database) => {
     }
   );
 
-  app.get(`${base_url}/getAll`, (req, res) => {
-    getAll(req, res, database);
-  });
+  app.get(
+    `${base_url}/getAll`,
+    (req, res, next) => auth(req, res, next, database),
+    (req, res) => {
+      getAll(req, res, database);
+    }
+  );
 
   app.delete(
     `${base_url}/remove`,

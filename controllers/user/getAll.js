@@ -13,7 +13,11 @@ module.exports = async (req, res, database) => {
         res = await database(
           `SELECT ${role_type}.*, department.name AS department_name, grade_year.name AS grade_year_name FROM ${role_type},department, grade_year WHERE department.id=${role_type}.department_id AND grade_year.id=${role_type}.grade_year_id`
         );
-      else res = await database(`SELECT * FROM ${role_type}`);
+      else {
+        if (role_id == 3)
+          res = await database(`SELECT * FROM ${role_type} WHERE code!=0`);
+        else res = await database(`SELECT * FROM ${role_type}`);
+      }
       return res;
     } catch (error) {
       console.log(error);
