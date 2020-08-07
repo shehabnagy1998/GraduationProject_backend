@@ -36,6 +36,6 @@ module.exports = async (req, res, database) => {
   }
   res.status(200).send({
     data: fixedContent,
-    name: "post_" + moment().format("DDMMhmmA"),
+    name: "post_" + moment().format("YYMMDDHHmmss"),
   });
 };

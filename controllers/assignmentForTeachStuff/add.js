@@ -59,7 +59,7 @@ module.exports = async (req, res, database) => {
 
       const res = await database(
         `INSERT INTO assignment_data (data, name, assignment_id) VALUE (?,?,?)`,
-        [path, data.filename, assignment_id]
+        [path, data.originalname, assignment_id]
       );
     } catch (error) {
       console.log(error);

@@ -9,6 +9,8 @@ module.exports = async (req, res, database) => {
   let user = res.locals.user;
   let role_id = res.locals.role_id;
   let role_type = res.locals.role_type;
+  let userInfo = {};
+
   let errFlag = false;
 
   let insertData = async (_) => {
@@ -27,7 +29,6 @@ module.exports = async (req, res, database) => {
         params = [...params, user.token];
         query += ", token=?";
       }
-      console.log(user.token);
       if (req.file) {
         CDN.remove(user.profile_image);
         let profile_image = req.file.path.replace(/\\/g, "/");
@@ -94,6 +95,48 @@ module.exports = async (req, res, database) => {
     }
   };
 
+  let getDepartment = async (_) => {
+    try {
+      const res = await database(
+        `SELECT * FROM department WHERE id=? LIMIT 1`,
+        [userInfo.department_id]
+      );
+      if (res.length >= 1) {
+        {
+          delete userInfo.department_id;
+          userInfo.department = res[0];
+          const ins = await database(
+            `SELECT * FROM institute WHERE id=? LIMIT 1`,
+            [userInfo.department.institute_id]
+          );
+          userInfo.institute = ins[0];
+          return true;
+        }
+      } else return false;
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+
+  let getGradeYear = async (_) => {
+    try {
+      const res = await database(
+        `SELECT * FROM grade_year WHERE id=? LIMIT 1`,
+        [userInfo.grade_year_id]
+      );
+      if (res.length >= 1) {
+        {
+          delete userInfo.grade_year_id;
+          userInfo.grade_year = res[0];
+          return true;
+        }
+      } else return false;
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
   //////////////////////////////////////////////////////////////////////
 
   // check for valid incoming varaibles
@@ -127,12 +170,14 @@ module.exports = async (req, res, database) => {
     return;
   }
 
-  let data = await insertData();
+  userInfo = await insertData();
+  await getDepartment();
+  await getGradeYear();
 
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });
     return;
   }
 
-  res.status(200).send(data);
+  res.status(200).send(userInfo);
 };

@@ -72,9 +72,9 @@ module.exports = async (req, res, database) => {
 
   if (await isExist()) {
     await remove();
-    res.status(200).send({ message: `post unsaved` });
+    res.status(200).send({ message: `post removed from saved posts` });
   } else {
     await insertNew();
-    res.status(200).send({ message: `post saved` });
+    res.status(200).send({ message: `post added to saved posts` });
   }
 };

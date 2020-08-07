@@ -86,7 +86,7 @@ module.exports = async (req, res, database) => {
       const path = data.path.replace(/\\/g, "/");
       const res = await database(
         `INSERT INTO student_assignment_data (assignment_id, student_code, data, name) VALUE (?,?,?,?)`,
-        [assignment_id, user.code, path, data.filename]
+        [assignment_id, user.code, path, data.originalname]
       );
     } catch (error) {
       console.log(error);

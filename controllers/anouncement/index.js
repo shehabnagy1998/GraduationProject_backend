@@ -12,7 +12,7 @@ module.exports = (app, database) => {
   app.post(
     `${base_url}/add`,
     (req, res, next) => adminAuth(req, res, next, database),
-    CDN.uploadUserPic.single("image"),
+    CDN.uploadNotificationPic.single("image"),
     (req, res) => {
       add(req, res, database);
     }
@@ -21,7 +21,7 @@ module.exports = (app, database) => {
   app.put(
     `${base_url}/edit`,
     (req, res, next) => adminAuth(req, res, next, database),
-    CDN.uploadUserPic.single("image"),
+    CDN.uploadNotificationPic.single("image"),
     (req, res) => {
       edit(req, res, database);
     }
