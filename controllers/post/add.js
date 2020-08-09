@@ -8,15 +8,48 @@ module.exports = async (req, res, database) => {
   let role_id = res.locals.role_id;
   let role_type = res.locals.role_type;
   let user = res.locals.user;
+  let courseState;
 
   let isCourseExist = async (_) => {
     try {
       const res = await database(
-        "SELECT code FROM course WHERE code=? LIMIt 1",
+        "SELECT doctor_code FROM course WHERE code=? LIMIt 1",
         [course_code]
       );
-      if (res.length >= 1) return true;
-      else return false;
+      if (res.length >= 1) {
+        courseState = res[0].doctor_code;
+        return true;
+      } else return false;
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+
+  let isStudentEnrolled = async (_) => {
+    try {
+      const res = await database(
+        "SELECT is_blocked FROM student_course WHERE student_code=? AND course_code=? LIMIt 1",
+        [user.code, course_code]
+      );
+      if (res.length >= 1) {
+        courseState = res[0].is_blocked;
+        return true;
+      } else return false;
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+  let isAssistantEnrolled = async (_) => {
+    try {
+      const res = await database(
+        "SELECT assistant_code FROM assistant_course WHERE assistant_code=? AND course_code=? LIMIt 1",
+        [user.code, course_code]
+      );
+      if (res.length >= 1) {
+        return true;
+      } else return false;
     } catch (error) {
       console.log(error);
       errFlag = true;
@@ -26,7 +59,6 @@ module.exports = async (req, res, database) => {
   let insertNew = async (_) => {
     try {
       let data_type = "none";
-      console.log(req.files);
       if (req.files && req.files.length >= 1) {
         if (req.files.length > 1) {
           data_type = "multiple";
@@ -94,14 +126,45 @@ module.exports = async (req, res, database) => {
     return;
   }
 
-  if (role_id === "0" && req.files && req.files.length >= 1) {
-    res.status(402).send({ message: `student cannot upload files` });
-    return;
-  }
-
   if (!(await isCourseExist())) {
     res.status(402).send({ message: `course not exist` });
     return;
+  }
+
+  if (role_id === "0") {
+    if (req.files && req.files.length >= 1) {
+      res.status(402).send({ message: `student cannot upload fileS` });
+      return;
+    }
+
+    if (!(await isStudentEnrolled())) {
+      res.status(402).send({ message: `Student not enrolled in this course` });
+      return;
+    }
+    console.log(user.code, courseState);
+
+    if (courseState == 1) {
+      res.status(402).send({ message: `Student is blocked from this course` });
+      return;
+    }
+  } else if (role_id === "1") {
+    if (type != "1") {
+      res
+        .status(402)
+        .send({ message: `Assistants cannot post in lectures section` });
+      return;
+    }
+    if (!(await isAssistantEnrolled())) {
+      res
+        .status(402)
+        .send({ message: `Assistant not enrolled in this course` });
+      return;
+    }
+  } else if (role_id === "2") {
+    if (courseState != user.code) {
+      res.status(402).send({ message: `Doctor not enrolled in this course` });
+      return;
+    }
   }
 
   await insertNew();
