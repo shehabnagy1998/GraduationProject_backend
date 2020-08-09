@@ -15,7 +15,7 @@ module.exports = async (req, res, database) => {
         );
       else {
         if (role_id == 3)
-          res = await database(`SELECT * FROM ${role_type} WHERE code!=0`);
+          res = await database(`SELECT * FROM ${role_type} WHERE code!=1`);
         else res = await database(`SELECT * FROM ${role_type}`);
       }
       return res;

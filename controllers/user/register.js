@@ -17,6 +17,19 @@ module.exports = async (req, res, database) => {
   let token = "";
   let errFlag = false;
 
+  let isNameExist = async (_) => {
+    try {
+      const res = await database(
+        `SELECT name FROM ${role_type} WHERE name=? LIMIT 1`,
+        [name]
+      );
+      if (res.length >= 1) {
+        return true;
+      } else return false;
+    } catch (error) {
+      errFlag = true;
+    }
+  };
   let isEmailExist = async (_) => {
     try {
       const res = await database(
@@ -27,7 +40,6 @@ module.exports = async (req, res, database) => {
         return true;
       } else return false;
     } catch (error) {
-      console.log(error);
       errFlag = true;
     }
   };
@@ -42,7 +54,6 @@ module.exports = async (req, res, database) => {
         return true;
       } else return false;
     } catch (error) {
-      console.log(error);
       errFlag = true;
     }
   };
@@ -58,7 +69,6 @@ module.exports = async (req, res, database) => {
         return true;
       } else return false;
     } catch (error) {
-      console.log(error);
       errFlag = true;
     }
   };
@@ -73,7 +83,6 @@ module.exports = async (req, res, database) => {
         return true;
       } else return false;
     } catch (error) {
-      console.log(error);
       errFlag = true;
     }
   };
@@ -88,7 +97,6 @@ module.exports = async (req, res, database) => {
         return true;
       } else return false;
     } catch (error) {
-      console.log(error);
       errFlag = true;
     }
   };
@@ -109,7 +117,6 @@ module.exports = async (req, res, database) => {
         ]
       );
     } catch (error) {
-      console.log(error);
       errFlag = true;
     }
   };
@@ -120,7 +127,6 @@ module.exports = async (req, res, database) => {
         [code, phone, email, name, password, token]
       );
     } catch (error) {
-      console.log(error);
       errFlag = true;
     }
   };
@@ -134,12 +140,11 @@ module.exports = async (req, res, database) => {
         );
       else {
         if (role_id == 3)
-          res = await database(`SELECT * FROM ${role_type} WHERE code!=0`);
+          res = await database(`SELECT * FROM ${role_type} WHERE code!=1`);
         else res = await database(`SELECT * FROM ${role_type}`);
       }
       return res;
     } catch (error) {
-      console.log(error);
       errFlag = true;
     }
   };
@@ -181,6 +186,13 @@ module.exports = async (req, res, database) => {
   }
 
   role_type = helpers.setType(role_id);
+  if (await isCodeExist()) {
+    res.status(400).send({
+      message: `code already exist`,
+    });
+    return;
+  }
+
   if (await isEmailExist()) {
     res.status(400).send({
       message: `email already exist`,
@@ -188,9 +200,9 @@ module.exports = async (req, res, database) => {
     return;
   }
 
-  if (await isCodeExist()) {
+  if (await isNameExist()) {
     res.status(400).send({
-      message: `code already exist`,
+      message: `name already exist`,
     });
     return;
   }
