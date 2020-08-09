@@ -5,16 +5,31 @@ module.exports = async (req, res, database) => {
   let role_type = res.locals.role_type;
   let role_id = res.locals.role_id;
   let user = res.locals.user;
-  let assignmentInfo;
+  let course_code;
 
   let isAssignmentExist = async (_) => {
     try {
       const res = await database(
-        "SELECT * FROM assignment WHERE id=? LIMIt 1",
+        "SELECT course_code FROM assignment WHERE id=? LIMIt 1",
         [assignment_id]
       );
       if (res.length >= 1) {
-        assignmentInfo = res[0];
+        course_code = res[0].course_code;
+        return true;
+      } else return false;
+    } catch (error) {
+      console.log(error);
+      errFlag = true;
+    }
+  };
+
+  let isCourseBlocked = async (_) => {
+    try {
+      const res = await database(
+        "SELECT is_blocked FROM student_course WHERE is_blocked=0 AND course_code=? AND student_code=? LIMIt 1",
+        [course_code, user.code]
+      );
+      if (res.length >= 1) {
         return true;
       } else return false;
     } catch (error) {
@@ -26,11 +41,10 @@ module.exports = async (req, res, database) => {
   let isExist = async (_) => {
     try {
       const res = await database(
-        "SELECT * FROM student_assignment WHERE assignment_id=? AND student_code=? LIMIt 1",
+        "SELECT mark FROM student_assignment WHERE assignment_id=? AND student_code=? LIMIt 1",
         [assignment_id, user.code]
       );
       if (res.length >= 1) {
-        assignmentInfo = res[0];
         return true;
       } else return false;
     } catch (error) {
@@ -83,6 +97,11 @@ module.exports = async (req, res, database) => {
 
   if (!(await isAssignmentExist())) {
     res.status(402).send({ message: `assignment not exist` });
+    return;
+  }
+
+  if (!(await isCourseBlocked())) {
+    res.status(402).send({ message: `you are blocked from this course` });
     return;
   }
 

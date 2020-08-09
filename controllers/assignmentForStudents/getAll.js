@@ -11,8 +11,8 @@ module.exports = async (req, res, database) => {
       page = page && page >= 1 ? page : 1;
       let offset = (page - 1) * limit;
       const selectRes = await database(
-        `SELECT assignment.*, course.name AS course_name FROM assignment, course WHERE course_code IN (SELECT code FROM course WHERE grade_year_id=? AND department_id=?) AND assignment.id NOT IN (SELECT assignment_id FROM student_assignment WHERE student_code=?) AND course.code=assignment.course_code AND DATE(assignment.deadline) > NOW() ORDER BY assignment.date DESC LIMIT ? OFFSET ?`,
-        [user.grade_year_id, user.department_id, user.code, limit, offset]
+        `SELECT assignment.*, course.name AS course_name FROM assignment, course WHERE course_code IN (SELECT course_code FROM student_course WHERE is_blocked=0 AND student_code=?) AND assignment.id NOT IN (SELECT assignment_id FROM student_assignment WHERE student_code=?) AND course.code=assignment.course_code AND DATE(assignment.deadline) > NOW() ORDER BY assignment.date DESC LIMIT ? OFFSET ?`,
+        [user.code, user.code, limit, offset]
       );
       for (let i = 0; i < selectRes.length; i++) {
         const element = selectRes[i];
@@ -33,8 +33,8 @@ module.exports = async (req, res, database) => {
       page = page && page >= 1 ? page : 1;
       let offset = (page - 1) * limit;
       const selectRes = await database(
-        `SELECT assignment.*, course.name AS course_name FROM assignment, course WHERE course_code IN (SELECT code FROM course WHERE grade_year_id=? AND department_id=?) AND assignment.id IN (SELECT assignment_id FROM student_assignment WHERE student_code=?)AND course.code=assignment.course_code  AND DATE(assignment.deadline) > NOW() ORDER BY assignment.date DESC LIMIT ? OFFSET ?`,
-        [user.grade_year_id, user.department_id, user.code, limit, offset]
+        `SELECT assignment.*, course.name AS course_name FROM assignment, course WHERE course_code IN (SELECT course_code FROM student_course WHERE is_blocked=0 AND student_code=?) AND assignment.id IN (SELECT assignment_id FROM student_assignment WHERE student_code=?)AND course.code=assignment.course_code  AND DATE(assignment.deadline) > NOW() ORDER BY assignment.date DESC LIMIT ? OFFSET ?`,
+        [user.code, user.code, limit, offset]
       );
       for (let i = 0; i < selectRes.length; i++) {
         const element = selectRes[i];

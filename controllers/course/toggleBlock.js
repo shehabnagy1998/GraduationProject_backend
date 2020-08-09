@@ -6,6 +6,7 @@ module.exports = async (req, res, database) => {
   let block_period = req.body.block_period;
   let errFlag = false;
   let is_blocked;
+  let io = res.locals.io;
 
   let isCourseExist = async (_) => {
     try {
@@ -51,8 +52,8 @@ module.exports = async (req, res, database) => {
   let toggleBlock = async (_) => {
     try {
       let query = `UPDATE student_course SET is_blocked=?, block_period=?, unblock_date=? WHERE student_code=? AND course_code=? LIMIt 1`;
-      let params = [!is_blocked];
-      if (!is_blocked) {
+      let params = [is_blocked];
+      if (is_blocked) {
         let duration = moment.duration(block_period, "d");
         let unblock_date = moment(new Date())
           .add(duration)
@@ -60,7 +61,6 @@ module.exports = async (req, res, database) => {
         params = [...params, block_period, unblock_date];
       } else params = [...params, 0, null];
       params = [...params, student_code, course_code];
-      console.log(params);
       const res = await database(query, params);
       if (res.length >= 1) {
         is_blocked = res[0].is_blocked;
@@ -74,7 +74,6 @@ module.exports = async (req, res, database) => {
 
   //////////////////////////////////////////////////////////////////////////////////
 
-  console.log(req.body);
   if (!student_code || !course_code || !block_period) {
     res.status(400).send({
       message: `${
@@ -105,13 +104,22 @@ module.exports = async (req, res, database) => {
     return;
   }
 
+  is_blocked = !is_blocked;
+
   await toggleBlock();
 
   if (errFlag) {
     res.status(500).send({ message: `internal server error` });
     return;
   }
+
+  io.sockets.emit("USER_BLOCKING", {
+    student_code,
+    course_code,
+    is_blocked,
+  });
+
   res.status(200).send({
-    message: `student has been ${!is_blocked ? "blocked" : "unblocked"}`,
+    message: `student has been ${is_blocked ? "blocked" : "unblocked"}`,
   });
 };
