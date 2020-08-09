@@ -25,9 +25,10 @@ module.exports = async (req, res, database) => {
 
   let isStudentExist = async (_) => {
     try {
-      const res = await database("SELECT  FROM student WHERE code=? LIMIt 1", [
-        student_code,
-      ]);
+      const res = await database(
+        "SELECT code FROM student WHERE code=? LIMIt 1",
+        [student_code]
+      );
       if (res.length >= 1) return true;
       else return false;
     } catch (error) {
